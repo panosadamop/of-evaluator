@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}{{ app_name }} — Home{% endblock %}
+
+{% block content %}
+<div class="py-5 text-center">
+    <h1 class="h3 fw-bold mb-2">{{ app_name }}</h1>
+    <p class="text-muted mb-4" style="max-width:520px; margin:0 auto;">
+        Analyze the complexity of Oracle Forms and Reports, then auto-generate
+        <strong>Jakarta EE 10</strong> and <strong>JasperReports</strong> code.
+        Upload individual files, entire folders as a <strong>ZIP archive</strong>,
+        or mix both.
+    </p>
+    <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a href="/analyze" class="btn btn-primary">Analyze Files</a>
+        <a href="/convert" class="btn btn-outline-secondary">Convert &amp; Download</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title fw-bold">Complexity Analysis</h6>
+                <p class="card-text text-muted small">
+                    Upload Oracle Forms (.fmt, .xml) or Reports (.rdf, .xml) — individually,
+                    as a ZIP, or a mix — and get a complexity score from
+                    <strong>L1 (Trivial)</strong> to <strong>L5 (Very Complex)</strong>
+                    with per-trigger factor breakdowns and effort estimates.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title fw-bold">Jakarta EE 10</h6>
+                <p class="card-text text-muted small">
+                    Oracle Forms &rarr; complete Maven project: JPA entity,
+                    CDI service bean (<code>@ApplicationScoped</code>),
+                    EJB facade (<code>@Stateless</code>), JAX-RS REST endpoint,
+                    JSF backing bean + XHTML view. Deployable on WildFly / Payara.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="card-title fw-bold">JasperReports</h6>
+                <p class="card-text text-muted small">
+                    Oracle Reports &rarr; full JRXML with all bands (Title, Header, Detail,
+                    Footer, Summary), migrated parameters, fields, and a Java runner class
+                    for PDF/XLSX export.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">How It Works</div>
+    <div class="card-body">
+        <div class="steps-bar mb-4">
+            <div class="step active">1. Upload</div>
+            <div class="step active">2. Parse</div>
+            <div class="step active">3. Analyze</div>
+            <div class="step active">4. Convert</div>
+            <div class="step active">5. Download ZIP</div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h6 class="fw-semibold mb-2">Supported Input</h6>
+                <ul class="list-unstyled small text-muted mb-0">
+                    <li class="mb-1"><code>.fmt</code> &mdash; Oracle Forms text export</li>
+                    <li class="mb-1"><code>.fmb</code> / <code>.xml</code> &mdash; Oracle Forms XML export</li>
+                    <li class="mb-1"><code>.rdf</code> / <code>.xml</code> &mdash; Oracle Reports XML export</li>
+                    <li class="mb-1"><code>.rpt</code> &mdash; Oracle Reports text export</li>
+                    <li class="mb-1"><code>.zip</code> &mdash; ZIP archive containing any of the above (folders included)</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-semibold mb-2">Complexity Scoring Factors</h6>
+                <ul class="list-unstyled small text-muted mb-0">
+                    <li class="mb-1">Trigger count &amp; type weights (ON-INSERT/UPDATE/DELETE = weight 3)</li>
+                    <li class="mb-1">DML inside triggers (INSERT / UPDATE / DELETE / MERGE)</li>
+                    <li class="mb-1">Dynamic SQL (EXECUTE IMMEDIATE / EXEC_SQL)</li>
+                    <li class="mb-1">Explicit cursors, loops, CASE/ELSIF expressions</li>
+                    <li class="mb-1">Exception handling blocks</li>
+                    <li class="mb-1">Navigation calls (GO_BLOCK / GO_ITEM)</li>
+                    <li class="mb-1">Program units &amp; SQL query count</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Quick Start</div>
+    <div class="card-body p-0">
+<pre class="mb-0 rounded-0">
+# Unzip and enter the project
+unzip oracle_migrator_project.zip &amp;&amp; cd oracle_migrator_project
+
+# Linux / macOS — creates venv automatically
+chmod +x run.sh &amp;&amp; ./run.sh
+
+# Windows
+run.bat
+
+# Open: http://localhost:5000
+
+# --- CLI (venv-aware) ---
+./migrate.sh demo                              # run with sample files
+./migrate.sh analyze sample_files/            # analyze a directory
+./migrate.sh convert sample_files/ --target both --output ./out --zip
+</pre>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Complexity Levels</div>
+    <div class="card-body">
+        <p class="text-muted small mb-3">
+            Every file is assigned one of five levels. <strong>Oracle Forms</strong> are scored on trigger
+            complexity; <strong>Oracle Reports</strong> use the Re_Forms&nbsp;21 metric model
+            (validated against 87 real reports).
+        </p>
+        <div class="row g-3">
+            <div class="col-md-4 col-lg">
+                <div class="border rounded p-3 h-100" style="border-color:#198754 !important;">
+                    <span class="badge bg-success mb-2">L1 &mdash; Trivial</span>
+                    <p class="small text-muted mb-1">
+                        Very few triggers &middot; No DML &middot; No cursors &middot;
+                        Minimal PL/SQL &middot; Reports score &lt;&nbsp;25
+                    </p>
+                    <p class="small mb-0">Effort: <strong>&lt; 1 day</strong></p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="border rounded p-3 h-100" style="border-color:#0dcaf0 !important;">
+                    <span class="badge bg-info text-dark mb-2">L2 &mdash; Simple</span>
+                    <p class="small text-muted mb-1">
+                        A few triggers &middot; Basic validation &middot; Light exception handling &middot;
+                        Reports score 25&ndash;49
+                    </p>
+                    <p class="small mb-0">Effort: <strong>1&ndash;3 days</strong></p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="border rounded p-3 h-100" style="border-color:#fd7e14 !important;">
+                    <span class="badge mb-2 text-white" style="background:#fd7e14;">L3 &mdash; Moderate</span>
+                    <p class="small text-muted mb-1">
+                        DML in triggers &middot; Explicit cursors or loops &middot;
+                        Navigation calls &middot; Reports score 50&ndash;74
+                    </p>
+                    <p class="small mb-0">Effort: <strong>5&ndash;10 days</strong></p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="border rounded p-3 h-100" style="border-color:#dc3545 !important;">
+                    <span class="badge bg-danger mb-2">L4 &mdash; Complex</span>
+                    <p class="small text-muted mb-1">
+                        Dynamic SQL &middot; ON-INSERT / UPDATE / DELETE &middot;
+                        Many program units &middot; Reports score 75&ndash;99
+                    </p>
+                    <p class="small mb-0">Effort: <strong>10&ndash;20 days</strong></p>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg">
+                <div class="border rounded p-3 h-100" style="border-color:#212529 !important;">
+                    <span class="badge text-white mb-2" style="background:#212529;">L5 &mdash; Very Complex</span>
+                    <p class="small text-muted mb-1">
+                        High trigger density &middot; EXECUTE IMMEDIATE &middot;
+                        Extensive PL/SQL &middot; Reports score &ge;&nbsp;100
+                    </p>
+                    <p class="small mb-0">Effort: <strong>20+ days</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,352 @@
+"""
+Sample Oracle Forms & Reports files for testing.
+"""
+from pathlib import Path
+
+
+SAMPLES = {
+    "EMPLOYEE_LOOKUP.fmt": """\
+BEGIN_OF_OBJECT BLOCK EMP_BLOCK
+  DATABASE_DATA_BLOCK = YES
+  QUERY_DATA_SOURCE_NAME = EMPLOYEES
+BEGIN_OF_TRIGGER WHEN-NEW-FORM-INSTANCE
+  GO_BLOCK('EMP_BLOCK');
+  EXECUTE_QUERY;
+END_OF_TRIGGER
+BEGIN_OF_TRIGGER WHEN-BUTTON-PRESSED
+  CLEAR_FORM;
+END_OF_TRIGGER
+END_OF_OBJECT BLOCK
+""",
+
+    "ORDER_ENTRY.fmt": """\
+BEGIN_OF_OBJECT BLOCK ORDER_BLOCK
+  DATABASE_DATA_BLOCK = YES
+  QUERY_DATA_SOURCE_NAME = ORDERS
+
+BEGIN_OF_TRIGGER WHEN-NEW-FORM-INSTANCE
+  GO_BLOCK('ORDER_BLOCK');
+  EXECUTE_QUERY;
+  SET_ITEM_PROPERTY('ORDER_BLOCK.STATUS', ENABLED, PROPERTY_FALSE);
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER WHEN-VALIDATE-RECORD
+  IF :ORDER_BLOCK.TOTAL_AMOUNT < 0 THEN
+    MESSAGE('Total amount cannot be negative');
+    RAISE FORM_TRIGGER_FAILURE;
+  END IF;
+  IF :ORDER_BLOCK.CUSTOMER_ID IS NULL THEN
+    MESSAGE('Customer ID is required');
+    RAISE FORM_TRIGGER_FAILURE;
+  END IF;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER PRE-INSERT
+  :ORDER_BLOCK.CREATED_DATE := SYSDATE;
+  :ORDER_BLOCK.STATUS := 'PENDING';
+  SELECT ORDER_SEQ.NEXTVAL INTO :ORDER_BLOCK.ORDER_ID FROM DUAL;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER POST-COMMIT
+  BEGIN
+    UPDATE INVENTORY
+    SET QUANTITY = QUANTITY - :ORDER_BLOCK.QTY
+    WHERE ITEM_ID = :ORDER_BLOCK.ITEM_ID;
+    COMMIT;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      MESSAGE('Item not found in inventory');
+  END;
+END_OF_TRIGGER
+
+END_OF_OBJECT BLOCK
+""",
+
+    "PAYROLL_PROCESSING.fmt": """\
+BEGIN_OF_OBJECT BLOCK PAYROLL_BLOCK
+  DATABASE_DATA_BLOCK = YES
+  QUERY_DATA_SOURCE_NAME = PAYROLL
+
+BEGIN_OF_TRIGGER ON-INSERT
+  DECLARE
+    v_tax_rate    NUMBER;
+    v_net_salary  NUMBER;
+    v_dept_budget NUMBER;
+    CURSOR c_deductions IS
+      SELECT deduction_type, amount
+      FROM EMPLOYEE_DEDUCTIONS
+      WHERE emp_id = :PAYROLL_BLOCK.EMP_ID;
+    l_rec c_deductions%ROWTYPE;
+  BEGIN
+    FOR l_rec IN c_deductions LOOP
+      IF l_rec.deduction_type = 'TAX' THEN
+        v_tax_rate := l_rec.amount / 100;
+      ELSIF l_rec.deduction_type = 'PENSION' THEN
+        :PAYROLL_BLOCK.PENSION := l_rec.amount;
+      END IF;
+    END LOOP;
+
+    v_net_salary := :PAYROLL_BLOCK.GROSS_SALARY * (1 - NVL(v_tax_rate, 0))
+                    - NVL(:PAYROLL_BLOCK.PENSION, 0);
+
+    EXECUTE IMMEDIATE
+      'INSERT INTO PAYROLL_AUDIT(EMP_ID, NET_SALARY, AUDIT_DATE) ' ||
+      'VALUES (:1, :2, SYSDATE)'
+      USING :PAYROLL_BLOCK.EMP_ID, v_net_salary;
+
+    :PAYROLL_BLOCK.NET_SALARY := v_net_salary;
+
+    SELECT SUM(BUDGET) INTO v_dept_budget
+    FROM DEPARTMENT_BUDGETS
+    WHERE DEPT_ID = :PAYROLL_BLOCK.DEPT_ID;
+
+    IF v_net_salary > v_dept_budget * 0.3 THEN
+      MESSAGE('Warning: Salary exceeds 30% of department budget');
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      MESSAGE('Error processing payroll: ' || SQLERRM);
+      RAISE FORM_TRIGGER_FAILURE;
+  END;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER ON-UPDATE
+  DECLARE
+    v_old_salary NUMBER;
+  BEGIN
+    SELECT GROSS_SALARY INTO v_old_salary
+    FROM EMPLOYEES
+    WHERE EMP_ID = :PAYROLL_BLOCK.EMP_ID
+    FOR UPDATE;
+
+    IF ABS(:PAYROLL_BLOCK.GROSS_SALARY - v_old_salary) / NULLIF(v_old_salary, 0) > 0.20 THEN
+      INSERT INTO SALARY_CHANGE_AUDIT(EMP_ID, OLD_SAL, NEW_SAL, CHANGE_DATE)
+      VALUES(:PAYROLL_BLOCK.EMP_ID, v_old_salary, :PAYROLL_BLOCK.GROSS_SALARY, SYSDATE);
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      MESSAGE('Employee record not found');
+    WHEN OTHERS THEN
+      ROLLBACK;
+      RAISE FORM_TRIGGER_FAILURE;
+  END;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER PRE-COMMIT
+  GO_BLOCK('PAYROLL_BLOCK');
+  IF :SYSTEM.BLOCK_STATUS = 'CHANGED' THEN
+    IF :PAYROLL_BLOCK.APPROVED_BY IS NULL THEN
+      MESSAGE('Manager approval required before commit');
+      GO_ITEM('PAYROLL_BLOCK.APPROVED_BY');
+      RAISE FORM_TRIGGER_FAILURE;
+    END IF;
+  END IF;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER KEY-EXEQRY
+  DECLARE
+    v_sql VARCHAR2(2000);
+  BEGIN
+    v_sql := 'SELECT * FROM PAYROLL WHERE 1=1';
+    IF :PAYROLL_BLOCK.EMP_ID IS NOT NULL THEN
+      v_sql := v_sql || ' AND EMP_ID = ' || :PAYROLL_BLOCK.EMP_ID;
+    END IF;
+    EXECUTE IMMEDIATE v_sql;
+  END;
+END_OF_TRIGGER
+
+END_OF_OBJECT BLOCK
+""",
+
+    "SALES_REPORT.xml": """\
+<?xml version="1.0"?>
+<Report Name="SALES_REPORT">
+  <DataModel>
+    <Query Name="Q_SALES" DatabaseDataBlock="YES"
+           SelectStatement="SELECT S.SALE_ID, S.SALE_DATE, C.CUSTOMER_NAME,
+           P.PRODUCT_NAME, S.QUANTITY, S.UNIT_PRICE,
+           (S.QUANTITY * S.UNIT_PRICE) AS TOTAL_AMOUNT
+           FROM SALES S
+           JOIN CUSTOMERS C ON S.CUSTOMER_ID = C.CUSTOMER_ID
+           JOIN PRODUCTS P ON S.PRODUCT_ID = P.PRODUCT_ID
+           WHERE S.SALE_DATE BETWEEN :P_START_DATE AND :P_END_DATE
+           ORDER BY S.SALE_DATE"/>
+  </DataModel>
+  <Parameters>
+    <Parameter Name="P_START_DATE" DataType="DATE" InitialValue="01-JAN-2024"/>
+    <Parameter Name="P_END_DATE" DataType="DATE" InitialValue="31-DEC-2024"/>
+    <Parameter Name="P_TITLE" DataType="VARCHAR2" InitialValue="Sales Report"/>
+  </Parameters>
+  <BeforeReport>
+    <FunctionBody>
+FUNCTION BeforeReport RETURN BOOLEAN IS
+BEGIN
+  :P_TITLE := 'Sales Report - ' || TO_CHAR(SYSDATE, 'YYYY');
+  RETURN TRUE;
+END;
+    </FunctionBody>
+  </BeforeReport>
+</Report>
+""",
+
+    "INVENTORY_FORM.fmt": """\
+BEGIN_OF_OBJECT BLOCK INVENTORY_BLOCK
+  DATABASE_DATA_BLOCK = YES
+  QUERY_DATA_SOURCE_NAME = INVENTORY
+
+BEGIN_OF_TRIGGER WHEN-NEW-FORM-INSTANCE
+  GO_BLOCK('INVENTORY_BLOCK');
+  EXECUTE_QUERY;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER WHEN-VALIDATE-ITEM
+  IF :INVENTORY_BLOCK.QUANTITY < 0 THEN
+    MESSAGE('Quantity cannot be negative');
+    RAISE FORM_TRIGGER_FAILURE;
+  END IF;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER PRE-INSERT
+  SELECT INVENTORY_SEQ.NEXTVAL
+  INTO :INVENTORY_BLOCK.ITEM_ID
+  FROM DUAL;
+  :INVENTORY_BLOCK.CREATED_DATE := SYSDATE;
+END_OF_TRIGGER
+
+BEGIN_OF_TRIGGER PRE-UPDATE
+  :INVENTORY_BLOCK.LAST_MODIFIED := SYSDATE;
+END_OF_TRIGGER
+
+END_OF_OBJECT BLOCK
+""",
+
+    "PAYROLL_PROCESSING_FULL.fmt": """\
+BEGIN_OF_OBJECT PROGRAM_UNIT VALIDATE_SALARY
+  PROGRAM_UNIT_TYPE = FUNCTION
+  PROGRAM_UNIT_TEXT =
+    FUNCTION VALIDATE_SALARY(p_emp_id NUMBER, p_gross NUMBER) RETURN BOOLEAN IS
+      v_min_wage NUMBER;
+      v_max_pct  NUMBER := 0.5;
+    BEGIN
+      SELECT NVL(MIN_WAGE, 0) INTO v_min_wage
+      FROM SALARY_BANDS
+      WHERE EFFECTIVE_DATE <= SYSDATE
+      ORDER BY EFFECTIVE_DATE DESC;
+
+      IF p_gross < v_min_wage THEN
+        MESSAGE('Salary below minimum wage: ' || v_min_wage);
+        RETURN FALSE;
+      END IF;
+
+      RETURN TRUE;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        RETURN TRUE;
+      WHEN OTHERS THEN
+        MESSAGE('Error in VALIDATE_SALARY: ' || SQLERRM);
+        RETURN FALSE;
+    END VALIDATE_SALARY;
+END_OF_OBJECT PROGRAM_UNIT
+
+BEGIN_OF_OBJECT PROGRAM_UNIT CALC_NET_SALARY
+  PROGRAM_UNIT_TYPE = PROCEDURE
+  PROGRAM_UNIT_TEXT =
+    PROCEDURE CALC_NET_SALARY(p_emp_id IN NUMBER, p_net OUT NUMBER) IS
+      v_tax    NUMBER := 0;
+      v_pension NUMBER := 0;
+      CURSOR c_ded IS
+        SELECT deduction_type, amount
+        FROM EMPLOYEE_DEDUCTIONS
+        WHERE emp_id = p_emp_id;
+    BEGIN
+      FOR r IN c_ded LOOP
+        IF r.deduction_type = 'TAX' THEN
+          v_tax := r.amount;
+        ELSIF r.deduction_type = 'PENSION' THEN
+          v_pension := r.amount;
+        END IF;
+      END LOOP;
+      SELECT GROSS_SALARY - v_tax - v_pension INTO p_net
+      FROM EMPLOYEES WHERE EMP_ID = p_emp_id;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN p_net := 0;
+    END CALC_NET_SALARY;
+END_OF_OBJECT PROGRAM_UNIT
+
+BEGIN_OF_OBJECT BLOCK PAYROLL_BLOCK
+  DATABASE_DATA_BLOCK = YES
+  QUERY_DATA_SOURCE_NAME = PAYROLL
+
+BEGIN_OF_TRIGGER ON-INSERT
+  DECLARE
+    v_net NUMBER;
+    v_ok  BOOLEAN;
+  BEGIN
+    v_ok := VALIDATE_SALARY(:PAYROLL_BLOCK.EMP_ID, :PAYROLL_BLOCK.GROSS_SALARY);
+    IF NOT v_ok THEN
+      RAISE FORM_TRIGGER_FAILURE;
+    END IF;
+    CALC_NET_SALARY(:PAYROLL_BLOCK.EMP_ID, v_net);
+    :PAYROLL_BLOCK.NET_SALARY := v_net;
+  EXCEPTION
+    WHEN OTHERS THEN
+      MESSAGE('Insert failed: ' || SQLERRM);
+      RAISE FORM_TRIGGER_FAILURE;
+  END;
+END_OF_TRIGGER
+
+END_OF_OBJECT BLOCK
+""",
+
+    "MONTHLY_REPORT.xml": """\
+<?xml version="1.0"?>
+<Report Name="MONTHLY_REPORT">
+  <DataModel>
+    <Query Name="Q_MONTHLY"
+           SelectStatement="SELECT DEPT_NAME, EMPLOYEE_COUNT, TOTAL_SALARY,
+           AVG_SALARY, HIRE_COUNT_YTD
+           FROM V_MONTHLY_DEPT_SUMMARY
+           WHERE REPORT_MONTH = :P_MONTH
+           ORDER BY DEPT_NAME"/>
+    <Query Name="Q_TOTALS"
+           SelectStatement="SELECT SUM(TOTAL_SALARY) AS GRAND_TOTAL,
+           COUNT(*) AS TOTAL_DEPTS
+           FROM V_MONTHLY_DEPT_SUMMARY
+           WHERE REPORT_MONTH = :P_MONTH"/>
+  </DataModel>
+  <Parameters>
+    <Parameter Name="P_MONTH" DataType="DATE" InitialValue="01-JAN-2024"/>
+  </Parameters>
+  <BeforeReport>
+    <FunctionBody>
+FUNCTION BeforeReport RETURN BOOLEAN IS
+BEGIN
+  RETURN TRUE;
+END;
+    </FunctionBody>
+  </BeforeReport>
+  <AfterReport>
+    <FunctionBody>
+FUNCTION AfterReport RETURN BOOLEAN IS
+BEGIN
+  UPDATE REPORT_LOG SET LAST_RUN = SYSDATE WHERE REPORT_NAME = 'MONTHLY_REPORT';
+  COMMIT;
+  RETURN TRUE;
+END;
+    </FunctionBody>
+  </AfterReport>
+</Report>
+""",
+}
+
+
+def create_samples(output_dir: str) -> list:
+    """Write all sample files to the given directory."""
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    created = []
+    for name, content in SAMPLES.items():
+        path = out / name
+        path.write_text(content)
+        created.append(str(path))
+    return created

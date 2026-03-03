@@ -1,0 +1,2817 @@
+<?xml version="1.0" encoding="ISO-8859-7" ?>
+<report name="PENPRN_DEC_INSTANCE_ETEAM_DEATH" DTDVersion="9.0.2.0.10"
+ designInCharacterUnits="yes">
+  <xmlSettings xmlTag="T14401124" xmlPrologType="text">
+  <![CDATA[<?xml version="1.0"?>]]>
+  </xmlSettings>
+  <reportHtmlEscapes>
+    <beforeReportHtmlEscape>
+    <![CDATA[<html>
+<body dir=&Direction bgcolor="#ffffff">
+]]>
+    </beforeReportHtmlEscape>
+    <beforePageHtmlEscape>
+    <![CDATA[#NULL#]]>
+    </beforePageHtmlEscape>
+    <afterPageHtmlEscape>
+    <![CDATA[<hr size=5 noshade>
+]]>
+    </afterPageHtmlEscape>
+    <beforeFormHtmlEscape>
+    <![CDATA[<html>
+<body dir=&Direction bgcolor="#ffffff">
+<form method=post action="_action_">
+<input name="hidden_run_parameters" type=hidden value="_hidden_">
+<font color=red><!--error--></font>
+<center>
+<p><table border=0 cellspacing=0 cellpadding=0>
+<tr>
+<td><input type=submit></td>
+<td width=15>
+<td><input type=reset></td>
+</tr>
+</table>
+<p><hr><p>
+]]>
+    </beforeFormHtmlEscape>
+    <pageNavigationHtmlEscape>
+    <![CDATA[<HTML>
+<TITLE>Oracle HTML Navigator</TITLE>
+<HEAD>
+<SCRIPT LANGUAGE = "JavaScript">
+
+var jump_index = 1			// Jump to this page
+var num_pages = &TotalPages			// Total number of pages
+var basefilename = "&file_name"		// Base file name
+var fileext = "&file_ext"		//File extension
+
+/* jumps to "new_page" */
+function new_page(form, new_page)
+{
+	form.reqpage.value = new_page;
+	parent.frames[0].location = basefilename + "_" + new_page + "."+fileext;
+}
+
+/* go back one page */
+function back(form)
+{
+	/* if we are not in first page */
+	if (jump_index > 1)
+	{
+		jump_index--;
+		new_page(form, jump_index);
+	}
+}
+
+/* go forward one page */
+function forward(form)
+{
+	/* if we are not in last page */
+	if (jump_index < num_pages)
+	{
+		jump_index++;
+		new_page(form, jump_index);
+	}
+}
+
+/* go to first page */
+function first(form)
+{
+	if(jump_index != 1)
+	{
+		jump_index = 1;
+		new_page(form, jump_index);
+	}
+}
+
+/* go to last page */
+function last(form)
+{
+	if(jump_index != num_pages)
+	{
+		jump_index = num_pages;
+		new_page(form, jump_index);
+	}
+}
+
+/* go to the user specified page number */
+function pagenum(form)
+{
+	/* sanity check */
+	if (form.reqpage.value < 1)
+	{
+		form.reqpage.value = 1;
+	}
+	if (form.reqpage.value > num_pages)
+	{
+		form.reqpage.value = num_pages;
+	}
+	jump_index = form.reqpage.value;
+	new_page(form, jump_index);
+}
+</SCRIPT>
+</HEAD>
+
+<BODY>
+<FORM NAME="ThisForm" onSubmit="pagenum(this); return false;">
+<center><table><tr>
+<td> <INPUT TYPE="button"  VALUE="<< " onClick="first(this.form)">
+<td> <INPUT TYPE="button"  VALUE=" < " onClick="back(this.form)">
+<td> <INPUT TYPE="button"  VALUE="Page:" onClick="pagenum(this.form)">
+<td> <INPUT NAME="reqpage" VALUE="1" SIZE=2>
+<td> <INPUT TYPE="button"  VALUE=" > " onClick="forward(this.form)">
+<td> <INPUT TYPE="button"  VALUE=" >>" onClick="last(this.form)">
+</table></center>
+</FORM></BODY>
+</HTML>
+]]>
+    </pageNavigationHtmlEscape>
+  </reportHtmlEscapes>
+  <data>
+    <userParameter name="P_APPL_INCR_SEQ_NO" datatype="number" width="7"
+     initialValue="197" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_APPL_UNIT_CODE" datatype="character" width="5"
+     initialValue="101" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_APPL_YEAR" datatype="number" width="4"
+     initialValue="2001" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_INSURED_ID" datatype="character" width="9"
+     defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_QC_PER_PRODINST" datatype="character" width="5"
+     initialValue="1" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DT_DEC_UNIT_CODE" datatype="character" width="5"
+     initialValue="001" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DEC_INCR_SEC_NO" datatype="character" width="9"
+     initialValue="587" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DT_DECISION_YEAR" datatype="number" width="4"
+     initialValue="2001" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_ACC_START_DATE" datatype="date" width="10"
+     precision="10" initialValue="2/2/2001" defaultWidth="0" defaultHeight="0"
+    />
+    <userParameter name="P_INSURED_NAME" datatype="character" width="30"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_INSURED_SURNAME" datatype="character" width="50"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_INCR_SEC_NO" datatype="number" width="5"
+     precision="10" initialValue="453" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_SALARY" datatype="number" precision="10"
+     initialValue="200000" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_ACC_ACCOUNT_NO" datatype="character" width="40"
+     defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_BRANCH_NAME" datatype="character" width="50"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DEPT" datatype="character" width="50"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_COMMIT_DATE" datatype="date" width="10"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DEC_YEAR" datatype="character" width="40"
+     defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_INSURED_ID_IND" datatype="character" width="9"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DT_DECISION_YEAR_SR" datatype="number" width="4"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DEC_INCR_SEC_NO_SR" datatype="number" width="12"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_DT_DEC_UNIT_CODE_SR" datatype="character" width="5"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <userParameter name="P_GROUP_ID" datatype="number" width="5"
+     precision="10" defaultWidth="0" defaultHeight="0"/>
+    <systemParameter name="MODE" initialValue="Character"/>
+    <systemParameter name="DECIMAL" initialValue=","/>
+    <systemParameter name="THOUSANDS" initialValue="."/>
+    <systemParameter name="DESFORMAT" initialValue="GENERIC"/>
+    <dataSource name="Q_1">
+      <select>
+      <![CDATA[SELECT COM_ORG_BRANCHES.BRANCH_DOMAIN_TYPE, 
+       COM_ORG_BRANCHES.BRANCH_NAME, 
+       PEN_PRODUCTS.PROCUCT_DESCRIPTION,
+	   COM_PENSION_IKA_INSTITUTION.PENSION_IKA_INST_NAME,
+	   PEN_APPLICATION_INSTANCES.PROTOCOL_NO, 
+	   REG_INSURED.INSURED_ID, 
+	   REG_INSURED.SEX, 
+	   REG_INSURED.SURNAME,
+                   REG_INSURED.NAME,
+                   REG_INSURED.FATHER_NAME,
+                   REG_INSURED.MOTHER_NAME,
+                   DECODE(REG_INSURED.SEX,'Α','του ασφαλισμένου ','θ','της ασφαλισμένης '),
+                   REG_INSURED.DATE_OF_BIRTH
+  FROM REG_INSURED, 
+       PEN_APPLICATION_INSTANCES, 
+	   COM_ORG_BRANCHES, 
+	   PEN_QC_PER_PRODINST, 
+	   PEN_PRODUCT_PER_INSTITUTIONS,
+	   PEN_PRODUCTS,
+	   COM_PENSION_IKA_INSTITUTION
+ WHERE PEN_APPLICATION_INSTANCES.APPLICATION_INCR_SEQ_NO=:P_APPL_INCR_SEQ_NO
+   AND PEN_APPLICATION_INSTANCES.PDTA_APPLICATION_UNIT_CODE=:P_APPL_UNIT_CODE
+   AND PEN_APPLICATION_INSTANCES.PDTA_DOCUMENT_TYPE_APPL_CODE='00001'
+   AND PEN_APPLICATION_INSTANCES.PDTA_APPLICATION_YEAR=:P_APPL_YEAR
+  AND PEN_APPLICATION_INSTANCES.INSURED_ID=:P_INSURED_ID_IND
+   AND REG_INSURED.INSURED_ID=PEN_APPLICATION_INSTANCES.INSURED_ID
+   AND PEN_QC_PER_PRODINST.QC_PER_PRODINST_CODE=:P_QC_PER_PRODINST
+   AND PEN_QC_PER_PRODINST.PRODUCT_PER_INSTITUTION_CODE=PEN_PRODUCT_PER_INSTITUTIONS.PRODUCT_PER_INSTITUTION_CODE
+   AND COM_PENSION_IKA_INSTITUTION.PENSION_IKA_INST_CODE=PEN_PRODUCT_PER_INSTITUTIONS.INSTITUTION_CODE
+   AND PEN_PRODUCTS.PRODUCT_CODE=PEN_PRODUCT_PER_INSTITUTIONS.PRODUCT_CODE
+AND COM_ORG_BRANCHES.BRANCH_CODE=:P_DT_DEC_UNIT_CODE;]]>
+      </select>
+      <displayInfo x="0.47913" y="0.11438" width="1.80212" height="0.59399"/>
+      <group name="G_BRANCH_DOMAIN_TYPE">
+        <displayInfo x="0.44580" y="0.79163" width="1.81458" height="1.11426"
+        />
+        <dataItem name="DATE_OF_BIRTH" datatype="date" oracleDatatype="date"
+         columnOrder="74" width="9" defaultWidth="90000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Date Of Birth">
+          <dataDescriptor expression="REG_INSURED.DATE_OF_BIRTH"
+           descriptiveExpression="DATE_OF_BIRTH" order="13"
+           oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="SURNAME" datatype="vchar2" columnOrder="69" width="50"
+         defaultWidth="100000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Surname">
+          <dataDescriptor expression="REG_INSURED.SURNAME"
+           descriptiveExpression="SURNAME" order="8" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="NAME" datatype="vchar2" columnOrder="70" width="30"
+         defaultWidth="100000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Name">
+          <dataDescriptor expression="REG_INSURED.NAME"
+           descriptiveExpression="NAME" order="9" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="FATHER_NAME" datatype="vchar2" columnOrder="71"
+         width="30" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Father Name">
+          <dataDescriptor expression="REG_INSURED.FATHER_NAME"
+           descriptiveExpression="FATHER_NAME" order="10" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="MOTHER_NAME" datatype="vchar2" columnOrder="72"
+         width="30" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Mother Name">
+          <dataDescriptor expression="REG_INSURED.MOTHER_NAME"
+           descriptiveExpression="MOTHER_NAME" order="11" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="DECODE_REG_INSURED_SEX_Α_του_α" datatype="vchar2"
+         columnOrder="68" width="17" defaultWidth="100000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="Decode Reg Insured Sex Α Του Α">
+          <dataDescriptor
+           alias="DECODE ( REG_INSURED.SEX , &apos;Α&apos; , &apos;του ασφαλισμένου &apos; , &apos;θ&apos; , &apos;της ασφαλισμένης &apos; )"
+           expression="DECODE ( REG_INSURED.SEX , &apos;Α&apos; , &apos;του ασφαλισμένου &apos; , &apos;θ&apos; , &apos;της ασφαλισμένης &apos; )"
+           descriptiveExpression="DECODE(REG_INSURED.SEX,&apos;Α&apos;,&apos;ΤΟΥΑΣΦΑΛΙΣΜΕΝΟΥ&apos;,&apos;Θ&apos;,&apos;ΤΗΣΑΣΦΑΛΙΣΜΕΝΗΣ&apos;)"
+           order="12" width="17"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="BRANCH_DOMAIN_TYPE" datatype="vchar2" columnOrder="17"
+         width="5" defaultWidth="50000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Branch Domain Type">
+          <dataDescriptor expression="COM_ORG_BRANCHES.BRANCH_DOMAIN_TYPE"
+           descriptiveExpression="BRANCH_DOMAIN_TYPE" order="1" width="5"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="BRANCH_NAME" datatype="vchar2" columnOrder="18"
+         width="50" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Branch Name">
+          <dataDescriptor expression="COM_ORG_BRANCHES.BRANCH_NAME"
+           descriptiveExpression="BRANCH_NAME" order="2" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="PROCUCT_DESCRIPTION" datatype="vchar2"
+         columnOrder="19" width="50" defaultWidth="100000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="Procuct Description">
+          <dataDescriptor expression="PEN_PRODUCTS.PROCUCT_DESCRIPTION"
+           descriptiveExpression="PROCUCT_DESCRIPTION" order="3" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="PENSION_IKA_INST_NAME" datatype="vchar2"
+         columnOrder="20" width="50" defaultWidth="100000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="Pension Ika Inst Name">
+          <dataDescriptor
+           expression="COM_PENSION_IKA_INSTITUTION.PENSION_IKA_INST_NAME"
+           descriptiveExpression="PENSION_IKA_INST_NAME" order="4" width="50"
+          />
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="PROTOCOL_NO" datatype="vchar2" columnOrder="21"
+         width="20" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Protocol No">
+          <dataDescriptor expression="PEN_APPLICATION_INSTANCES.PROTOCOL_NO"
+           descriptiveExpression="PROTOCOL_NO" order="5" width="20"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="INSURED_ID" datatype="vchar2" columnOrder="22"
+         width="9" defaultWidth="90000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Insured Id">
+          <dataDescriptor expression="REG_INSURED.INSURED_ID"
+           descriptiveExpression="INSURED_ID" order="6" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="SEX" datatype="vchar2" columnOrder="23" width="1"
+         defaultWidth="10000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Sex">
+          <dataDescriptor expression="REG_INSURED.SEX"
+           descriptiveExpression="SEX" order="7" width="1"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <formula name="CF_SEX" source="cf_sexformula" datatype="character"
+         width="20" precision="10" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="16" defaultLabel="Cf Sex" breakOrder="none">
+          <displayInfo x="0.00000" y="0.00000" width="0.00000"
+           height="0.00000"/>
+        </formula>
+        <formula name="CF_1" source="cf_1formula" datatype="character"
+         width="15" precision="13" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="16" defaultLabel="Cf 1" breakOrder="none">
+          <displayInfo x="0.00000" y="0.00000" width="0.00000"
+           height="0.00000"/>
+        </formula>
+      </group>
+    </dataSource>
+    <dataSource name="Q_2">
+      <select>
+      <![CDATA[SELECT b.FULLNAME
+FROM
+  PEN_DEC_FACT_TYPES_INSTANCE a,
+  CON_EMPLOYERS b
+
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00074' AND
+  a.DEC_FACT_TYPE_CODE = '00045' AND
+  
+  a.VALUE = b.EMPLOYER_ID;
+]]>
+      </select>
+      <displayInfo x="3.13538" y="0.23962" width="1.91663" height="0.76038"/>
+      <group name="G_VALUE">
+        <displayInfo x="3.51257" y="1.28125" width="1.09998" height="0.43066"
+        />
+        <dataItem name="FULLNAME" datatype="vchar2" columnOrder="28"
+         width="70" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Fullname">
+          <dataDescriptor expression="b.FULLNAME"
+           descriptiveExpression="FULLNAME" order="1" width="70"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_3">
+      <select>
+      <![CDATA[SELECT NVL(TO_NUMBER(a.VALUE),0) value_4
+FROM 
+  PEN_DEC_FACT_TYPES_INSTANCE a
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00075' AND
+  a.DEC_FACT_TYPE_CODE = '00048'
+]]>
+      </select>
+      <displayInfo x="2.37488" y="1.96899" width="0.69995" height="0.36450"/>
+      <group name="G_FULLNAME1">
+        <displayInfo x="2.27100" y="2.59387" width="1.02063" height="0.60156"
+        />
+        <dataItem name="value_2" oracleDatatype="number" columnOrder="76"
+         width="22" defaultWidth="90000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Nvl To Number B Value 0">
+          <xmlSettings xmlTag="NVL_TO_NUMBER_B_VALUE_0"/>
+          <dataDescriptor expression="NVL ( TO_NUMBER ( a.VALUE ) , 0 )"
+           descriptiveExpression="VALUE_4" order="1" oracleDatatype="number"
+           width="22" precision="38"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_4">
+      <select>
+      <![CDATA[SELECT NVL(TO_NUMBER(a.VALUE),0) value_1
+FROM 
+  PEN_DEC_FACT_TYPES_INSTANCE a
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00075' AND
+  a.DEC_FACT_TYPE_CODE = '00070'
+]]>
+      </select>
+      <displayInfo x="3.45837" y="1.97937" width="0.69995" height="0.43738"/>
+      <group name="G_VALUE1">
+        <displayInfo x="3.34387" y="2.61450" width="0.98950" height="0.60156"
+        />
+        <dataItem name="value_1" oracleDatatype="number" columnOrder="77"
+         width="22" defaultWidth="90000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Nvl To Number B Value 1">
+          <xmlSettings xmlTag="NVL_TO_NUMBER_B_VALUE_1"/>
+          <dataDescriptor expression="NVL ( TO_NUMBER ( a.VALUE ) , 0 )"
+           descriptiveExpression="VALUE_1" order="1" oracleDatatype="number"
+           width="22" precision="38"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_5">
+      <select>
+      <![CDATA[SELECT NVL(TO_NUMBER(a.VALUE),0)  value_4
+FROM 
+  PEN_DEC_FACT_TYPES_INSTANCE a
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00075' AND
+  a.DEC_FACT_TYPE_CODE = '00122'
+
+]]>
+      </select>
+      <displayInfo x="4.49976" y="1.97913" width="0.80225" height="0.39575"/>
+      <group name="G_VALUE2">
+        <displayInfo x="4.41870" y="2.55225" width="1.09998" height="0.60156"
+        />
+        <dataItem name="value_3" oracleDatatype="number" columnOrder="35"
+         width="22" defaultWidth="90000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Nvl To Number A Value 2">
+          <xmlSettings xmlTag="NVL_TO_NUMBER_A_VALUE_2"/>
+          <dataDescriptor expression="NVL ( TO_NUMBER ( a.VALUE ) , 0 )"
+           descriptiveExpression="VALUE_4" order="1" oracleDatatype="number"
+           width="22" precision="38"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_6">
+      <select>
+      <![CDATA[SELECT b.EXIT_CAUSE_DESCR
+FROM
+  PEN_DEC_FACT_TYPES_INSTANCE a,
+  PEN_NPDD_EXIT_CAUSE b
+
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00074' AND
+  a.DEC_FACT_TYPE_CODE = '00064' AND
+
+  a.VALUE = b.EXIT_CAUSE_CODE;
+
+]]>
+      </select>
+      <displayInfo x="5.88562" y="1.84351" width="1.05200" height="0.80212"/>
+      <group name="G_EXIT_CAUSE">
+        <displayInfo x="5.70081" y="2.80188" width="1.54919" height="0.43066"
+        />
+        <dataItem name="EXIT_CAUSE_DESCR" datatype="vchar2" columnOrder="33"
+         width="100" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Exit Cause Descr">
+          <dataDescriptor expression="b.EXIT_CAUSE_DESCR"
+           descriptiveExpression="EXIT_CAUSE_DESCR" order="1" width="100"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_7">
+      <select>
+      <![CDATA[SELECT a.VALUE
+FROM 
+  PEN_DEC_FACT_TYPES_INSTANCE a
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00075' AND
+  a.DEC_FACT_TYPE_CODE = '00116';
+
+]]>
+      </select>
+      <displayInfo x="7.22925" y="1.85425" width="1.06250" height="0.51038"/>
+      <group name="G_DEC_NO">
+        <displayInfo x="7.35706" y="2.80212" width="0.86169" height="0.43066"
+        />
+        <dataItem name="VALUE" datatype="vchar2" columnOrder="34" width="50"
+         defaultWidth="100000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Value">
+          <dataDescriptor expression="a.VALUE" descriptiveExpression="VALUE"
+           order="1" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_8">
+      <select>
+      <![CDATA[SELECT TO_DATE(a.VALUE,'DD/MM/RRRR')
+FROM 
+  PEN_DEC_FACT_TYPES_INSTANCE a
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00075' AND
+  a.DEC_FACT_TYPE_CODE = '00112';
+]]>
+      </select>
+      <displayInfo x="8.44788" y="1.86462" width="1.00000" height="0.45825"/>
+      <group name="G_COMMIT_DATE">
+        <displayInfo x="8.41357" y="2.79163" width="1.02393" height="0.43066"
+        />
+        <dataItem name="TO_DATE_a_VALUE_DD_MM_RRRR" datatype="date"
+         oracleDatatype="date" columnOrder="36" width="9" defaultWidth="90000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="To Date A Value Dd Mm Rrrr">
+          <dataDescriptor
+           expression="TO_DATE ( a.VALUE , &apos;DD/MM/RRRR&apos; )"
+           descriptiveExpression="TO_DATE(A.VALUE,&apos;DD/MM/RRRR&apos;)"
+           order="1" oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_9">
+      <select>
+      <![CDATA[SELECT TO_DATE(a.VALUE,'DD/MM/RRRR')
+FROM 
+  PEN_DEC_FACT_TYPES_INSTANCE a
+WHERE
+
+    a.DI_DEC_INCR_SEQ_NO_SR = :P_DEC_INCR_SEC_NO_SR  AND
+   a.DI_DECISION_YEAR_SR = :P_DT_DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = :P_DT_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = '1' AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+  a.TITLE_CODE = '00075' AND
+  a.DEC_FACT_TYPE_CODE = '00114';]]>
+      </select>
+      <displayInfo x="9.56250" y="1.90613" width="1.25000" height="0.42712"/>
+      <group name="G_PAYMENT">
+        <displayInfo x="9.60608" y="2.80200" width="1.23767" height="0.43066"
+        />
+        <dataItem name="TO_DATE_a_VALUE_DD_MM_RRRR1" datatype="date"
+         oracleDatatype="date" columnOrder="37" width="9" defaultWidth="90000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="To Date A Value Dd Mm Rrrr1">
+          <dataDescriptor
+           expression="TO_DATE ( a.VALUE , &apos;DD/MM/RRRR&apos; )"
+           descriptiveExpression="TO_DATE(A.VALUE,&apos;DD/MM/RRRR&apos;)"
+           order="1" oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_10">
+      <select>
+      <![CDATA[SELECT '                                                  ' AMOUNT_DESCR,
+1 AMOUNT,
+' ' SUM_INDICATOR,
+' ' CALCULATION_FLG FROM DUAL;]]>
+      </select>
+      <displayInfo x="11.16663" y="1.92712" width="1.31250" height="0.34375"/>
+      <group name="G_AMOUNT_DESCR">
+        <displayInfo x="11.02881" y="2.76038" width="1.67126" height="0.94336"
+        />
+        <dataItem name="AMOUNT_DESCR" datatype="character"
+         oracleDatatype="aFixedChar" columnOrder="39" width="50"
+         defaultWidth="100000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Amount Descr">
+          <dataDescriptor
+           expression="&apos;                                                  &apos;"
+           descriptiveExpression="AMOUNT_DESCR" order="1" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="AMOUNT" oracleDatatype="number" columnOrder="40"
+         width="2" defaultWidth="90000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Amount">
+          <dataDescriptor expression="1" descriptiveExpression="AMOUNT"
+           order="2" width="2" precision="38"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="SUM_INDICATOR" datatype="character"
+         oracleDatatype="aFixedChar" columnOrder="41" width="1"
+         defaultWidth="10000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Sum Indicator">
+          <dataDescriptor expression="&apos; &apos;"
+           descriptiveExpression="SUM_INDICATOR" order="3" width="1"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="CALCULATION_FLG" datatype="character"
+         oracleDatatype="aFixedChar" columnOrder="42" width="1"
+         defaultWidth="10000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Calculation Flg">
+          <dataDescriptor expression="&apos; &apos;"
+           descriptiveExpression="CALCULATION_FLG" order="4" width="1"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_11">
+      <select>
+      <![CDATA[SELECT PEN_TEXTS_PER_DEC_INSTANCE.TXT_DESCR,
+       PEN_TEXTS_PER_DEC_INSTANCE.PRN_SEQUENCE
+  FROM 
+       PEN_TEXTS_PER_DEC_INSTANCE
+ WHERE 
+
+ 
+    PEN_TEXTS_PER_DEC_INSTANCE.INS_INSURED_ID=:P_INSURED_ID AND
+   
+    PEN_TEXTS_PER_DEC_INSTANCE.DI_DEC_INCR_SEQ_NO_SR= :P_DEC_INCR_SEC_NO_SR
+    AND PEN_TEXTS_PER_DEC_INSTANCE.DI_DEC_UNIT_CODE_SR= :P_DT_DEC_UNIT_CODE_SR
+   AND PEN_TEXTS_PER_DEC_INSTANCE.DI_DECISION_YEAR_SR= :P_DT_DECISION_YEAR_SR
+   AND   PEN_TEXTS_PER_DEC_INSTANCE.DI_DOCUMENT_TYPE_DEC_CODE_SR= '1'
+
+    AND PEN_TEXTS_PER_DEC_INSTANCE.CHOOCE_FLG='1'
+   AND PEN_TEXTS_PER_DEC_INSTANCE.RULE_OR_QUAL_FLG='0'
+  ORDER BY PEN_TEXTS_PER_DEC_INSTANCE.PRN_SEQUENCE]]>
+      </select>
+      <displayInfo x="13.06250" y="1.97913" width="1.03125" height="0.28125"/>
+      <group name="G_TXT_DESCR">
+        <displayInfo x="12.96130" y="2.78125" width="1.48376" height="0.60156"
+        />
+        <dataItem name="TXT_DESCR" datatype="vchar2" columnOrder="43"
+         width="100" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Txt Descr">
+          <dataDescriptor expression="PEN_TEXTS_PER_DEC_INSTANCE.TXT_DESCR"
+           descriptiveExpression="TXT_DESCR" order="1" width="100"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="PRN_SEQUENCE" oracleDatatype="number" columnOrder="44"
+         width="22" defaultWidth="50000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Prn Sequence">
+          <dataDescriptor expression="PEN_TEXTS_PER_DEC_INSTANCE.PRN_SEQUENCE"
+           descriptiveExpression="PRN_SEQUENCE" order="2"
+           oracleDatatype="number" width="22" precision="3"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_12">
+      <select>
+      <![CDATA[SELECT PEN_TEXTS_PER_DEC_INSTANCE.TXT_DESCR,
+       PEN_TEXTS_PER_DEC_INSTANCE.PRN_SEQUENCE
+   FROM 
+       PEN_TEXTS_PER_DEC_INSTANCE
+ WHERE 
+ 
+    PEN_TEXTS_PER_DEC_INSTANCE.INS_INSURED_ID=:P_INSURED_ID AND
+   
+    PEN_TEXTS_PER_DEC_INSTANCE.DI_DEC_INCR_SEQ_NO_SR= :P_DEC_INCR_SEC_NO_SR
+    AND PEN_TEXTS_PER_DEC_INSTANCE.DI_DEC_UNIT_CODE_SR= :P_DT_DEC_UNIT_CODE_SR
+   AND PEN_TEXTS_PER_DEC_INSTANCE.DI_DECISION_YEAR_SR= :P_DT_DECISION_YEAR_SR
+   AND   PEN_TEXTS_PER_DEC_INSTANCE.DI_DOCUMENT_TYPE_DEC_CODE_SR= '1'
+
+   AND PEN_TEXTS_PER_DEC_INSTANCE.CHOOCE_FLG='1'
+   AND PEN_TEXTS_PER_DEC_INSTANCE.RULE_OR_QUAL_FLG='1'
+  ORDER BY PEN_TEXTS_PER_DEC_INSTANCE.PRN_SEQUENCE]]>
+      </select>
+      <displayInfo x="14.68750" y="2.07288" width="1.67712" height="0.23962"/>
+      <group name="G_TXT_DESCR1">
+        <displayInfo x="14.75293" y="2.81250" width="1.54626" height="0.60156"
+        />
+        <dataItem name="TXT_DESCR1" datatype="vchar2" columnOrder="45"
+         width="100" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Txt Descr1">
+          <dataDescriptor expression="PEN_TEXTS_PER_DEC_INSTANCE.TXT_DESCR"
+           descriptiveExpression="TXT_DESCR" order="1" width="100"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="PRN_SEQUENCE1" oracleDatatype="number"
+         columnOrder="46" width="22" defaultWidth="50000"
+         defaultHeight="10000" columnFlags="1" defaultLabel="Prn Sequence1">
+          <dataDescriptor expression="PEN_TEXTS_PER_DEC_INSTANCE.PRN_SEQUENCE"
+           descriptiveExpression="PRN_SEQUENCE" order="2"
+           oracleDatatype="number" width="22" precision="3"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_13">
+      <select>
+      <![CDATA[SELECT FROM_WORKING_DATE, TO_WORKING_DATE,
+               INSURANCE_DAYS_QUAL_FINAL,
+               MONTH, YEAR
+	 FROM PEN_INSURED_DAYS
+	 WHERE PEN_INSURED_DAYS.ACC_ACCOUNT_NO= :P_ACC_ACCOUNT_NO
+	 AND PEN_INSURED_DAYS.INS_INSURED_ID= :P_INSURED_ID
+	 AND PEN_INSURED_DAYS.USE_FLG='1'
+	 AND PEN_INSURED_DAYS.INSURANCE_DAYS_CATEGORY='1'
+	 ORDER BY YEAR,MONTH,INSHISTYP_TRANS_TYPE;
+
+]]>
+      </select>
+      <displayInfo x="1.22937" y="3.65637" width="1.54163" height="0.48950"/>
+      <group name="G_MONTH">
+        <displayInfo x="0.91431" y="4.59363" width="2.35876" height="0.94336"
+        />
+        <dataItem name="FROM_WORKING_DATE" datatype="date"
+         oracleDatatype="date" columnOrder="59" width="9" defaultWidth="90000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="From Working Date">
+          <dataDescriptor expression="FROM_WORKING_DATE"
+           descriptiveExpression="FROM_WORKING_DATE" order="1"
+           oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="TO_WORKING_DATE" datatype="date" oracleDatatype="date"
+         columnOrder="60" width="9" defaultWidth="90000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="To Working Date">
+          <dataDescriptor expression="TO_WORKING_DATE"
+           descriptiveExpression="TO_WORKING_DATE" order="2"
+           oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="MONTH" oracleDatatype="number" columnOrder="52"
+         width="22" defaultWidth="40000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Month">
+          <dataDescriptor expression="MONTH" descriptiveExpression="MONTH"
+           order="4" oracleDatatype="number" width="22" precision="2"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="YEAR" oracleDatatype="number" columnOrder="53"
+         width="22" defaultWidth="60000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Year">
+          <dataDescriptor expression="YEAR" descriptiveExpression="YEAR"
+           order="5" oracleDatatype="number" width="22" precision="4"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="INSURANCE_DAYS_QUAL_FINAL" oracleDatatype="number"
+         columnOrder="54" width="22" defaultWidth="70000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="Insurance Days Qual Final">
+          <dataDescriptor expression="INSURANCE_DAYS_QUAL_FINAL"
+           descriptiveExpression="INSURANCE_DAYS_QUAL_FINAL" order="3"
+           oracleDatatype="number" width="22" precision="5"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_14">
+      <select>
+      <![CDATA[SELECT FROM_WORKING_DATE, TO_WORKING_DATE,
+               INSURANCE_DAYS_QUAL_FINAL,
+               MONTH, YEAR,
+              INSHISTYP_TRANS_TYPE
+	 FROM PEN_INSURED_DAYS
+	 WHERE PEN_INSURED_DAYS.ACC_ACCOUNT_NO= :P_ACC_ACCOUNT_NO
+	 AND PEN_INSURED_DAYS.INS_INSURED_ID= :P_INSURED_ID
+	 AND PEN_INSURED_DAYS.USE_FLG='1'
+	 AND PEN_INSURED_DAYS.INSURANCE_DAYS_CATEGORY='2'
+	 ORDER BY YEAR,MONTH,INSHISTYP_TRANS_TYPE;]]>
+      </select>
+      <displayInfo x="4.79175" y="3.50000" width="1.54163" height="0.67712"/>
+      <group name="G_MONTH1">
+        <displayInfo x="4.05005" y="4.60388" width="2.42126" height="0.77246"
+        />
+        <dataItem name="FROM_WORKING_DATE1" datatype="date"
+         oracleDatatype="date" columnOrder="61" width="9" defaultWidth="90000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="From Working Date1">
+          <dataDescriptor expression="FROM_WORKING_DATE"
+           descriptiveExpression="FROM_WORKING_DATE" order="1"
+           oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="TO_WORKING_DATE1" datatype="date"
+         oracleDatatype="date" columnOrder="62" width="9" defaultWidth="90000"
+         defaultHeight="10000" columnFlags="1" defaultLabel="To Working Date1">
+          <dataDescriptor expression="TO_WORKING_DATE"
+           descriptiveExpression="TO_WORKING_DATE" order="2"
+           oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="INSHISTYP_TRANS_TYPE1" datatype="vchar2"
+         columnOrder="58" width="5" defaultWidth="50000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Inshistyp Trans Type1">
+          <dataDescriptor expression="INSHISTYP_TRANS_TYPE"
+           descriptiveExpression="INSHISTYP_TRANS_TYPE" order="6" width="5"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="MONTH1" oracleDatatype="number" columnOrder="55"
+         width="22" defaultWidth="40000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Month1">
+          <dataDescriptor expression="MONTH" descriptiveExpression="MONTH"
+           order="4" oracleDatatype="number" width="22" precision="2"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="YEAR1" oracleDatatype="number" columnOrder="56"
+         width="22" defaultWidth="60000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Year1">
+          <dataDescriptor expression="YEAR" descriptiveExpression="YEAR"
+           order="5" oracleDatatype="number" width="22" precision="4"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="INSURANCE_DAYS_QUAL_FINAL1" oracleDatatype="number"
+         columnOrder="57" width="22" defaultWidth="70000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="Insurance Days Qual Final1">
+          <dataDescriptor expression="INSURANCE_DAYS_QUAL_FINAL"
+           descriptiveExpression="INSURANCE_DAYS_QUAL_FINAL" order="3"
+           oracleDatatype="number" width="22" precision="5"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_15">
+      <select>
+      <![CDATA[SELECT 
+        TRANS_TYPE, 
+        TRANS_DESCR
+FROM
+        COM_INSURANCE_HISTORY_TYPES;]]>
+      </select>
+      <displayInfo x="7.38538" y="3.64600" width="1.21875" height="0.61438"/>
+      <group name="G_TRANS_DESCR">
+        <displayInfo x="7.31042" y="4.73950" width="1.43176" height="0.60156"
+        />
+        <dataItem name="TRANS_TYPE" datatype="vchar2" columnOrder="64"
+         width="5" defaultWidth="50000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Trans Type">
+          <dataDescriptor expression="TRANS_TYPE"
+           descriptiveExpression="TRANS_TYPE" order="1" width="5"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="TRANS_DESCR" datatype="vchar2" columnOrder="63"
+         width="50" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Trans Descr">
+          <dataDescriptor expression="TRANS_DESCR"
+           descriptiveExpression="TRANS_DESCR" order="2" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_16">
+      <select>
+      <![CDATA[SELECT b.EXIT_CAUSE_DESCR
+
+  FROM
+  PEN_DEC_FACT_TYPES_INSTANCE a,
+  PEN_DECISION_INSTANCE c,
+  PEN_NPDD_EXIT_CAUSE b
+
+WHERE
+
+   c.DEC_INCR_SEQ_NO = :VALUE AND
+   c.DT_DECISION_YEAR  = :P_DT_DECISION_YEAR_SR  AND
+   c.DT_DEC_UNIT_CODE = :P_DT_DEC_UNIT_CODE_SR AND
+   c.DT_DOCUMENT_TYPE_DEC_CODE = '1' AND
+      
+   a.DI_DEC_INCR_SEQ_NO_SR =  c.INCR_SEQ_NO_SR AND
+   a.DI_DECISION_YEAR_SR = DECISION_YEAR_SR  AND
+   a.DI_DEC_UNIT_CODE_SR = DI_DEC_UNIT_CODE_SR AND
+   a.DI_DOCUMENT_TYPE_DEC_COCE_SR = DOCUMENT_TYPE_DEC_CODE_SR AND
+   a.INS_INSURED_ID = :P_INSURED_ID AND
+
+   a.TITLE_CODE = '00074' AND
+   a.DEC_FACT_TYPE_CODE = '00064' AND
+
+   a.VALUE = b.EXIT_CAUSE_CODE;
+]]>
+      </select>
+      <displayInfo x="7.16675" y="0.28125" width="1.09375" height="0.41663"/>
+      <group name="G_PENSION_CAUSE">
+        <displayInfo x="6.88843" y="1.04150" width="1.77551" height="0.60156"
+        />
+        <dataItem name="EXIT_CAUSE_DESCR1" datatype="vchar2" columnOrder="73"
+         width="100" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Exit Cause Descr1">
+          <dataDescriptor expression="b.EXIT_CAUSE_DESCR"
+           descriptiveExpression="EXIT_CAUSE_DESCR" order="1" width="100"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_17">
+      <select>
+      <![CDATA[SELECT 
+ 
+    b.DATE_OF_BIRTH,
+    b.NAME
+
+FROM 
+     PEN_DECISION_INSTANCE_DEATH a,
+     REG_INSURED b
+  
+WHERE
+
+  a.GROUP_ID = :P_GROUP_ID AND
+
+  a.DEPENDENCY_TYPE = '00003' AND
+  a.INSURED_ID = b.INSURED_ID]]>
+      </select>
+      <displayInfo x="17.04163" y="1.98962" width="1.44800" height="0.32288"/>
+      <group name="G_INS_INSURED_ID_INDIRECT">
+        <displayInfo x="16.70618" y="2.70850" width="2.66882" height="0.94336"
+        />
+        <dataItem name="NAME2" datatype="vchar2" columnOrder="98" width="30"
+         defaultWidth="100000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Name2">
+          <dataDescriptor expression="b.NAME" descriptiveExpression="NAME"
+           order="2" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="DATE_OF_BIRTH2" datatype="date" oracleDatatype="date"
+         columnOrder="97" width="9" defaultWidth="90000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Date Of Birth2">
+          <dataDescriptor expression="b.DATE_OF_BIRTH"
+           descriptiveExpression="DATE_OF_BIRTH" order="1"
+           oracleDatatype="date" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <formula name="CF_6" source="cf_6formula" datatype="number" width="14"
+         precision="12" defaultWidth="0" defaultHeight="0" columnFlags="16"
+         breakOrder="none">
+          <displayInfo x="0.00000" y="0.00000" width="0.00000"
+           height="0.00000"/>
+        </formula>
+        <summary name="CS_11" source="NAME2" function="count" width="20"
+         precision="10" reset="report" compute="report" defaultWidth="0"
+         defaultHeight="0" columnFlags="8">
+          <displayInfo x="0.00000" y="0.00000" width="0.00000"
+           height="0.00000"/>
+        </summary>
+      </group>
+    </dataSource>
+    <dataSource name="Q_19">
+      <select>
+      <![CDATA[SELECT
+    a.SURNAME,
+    a.NAME,
+    a.FATHER_NAME,
+    a.MOTHER_NAME,
+    a.INSURED_ID,
+   a.DATE_OF_BIRTH,
+   a.DATE_OF_DEATH
+FROM 
+   REG_INSURED a 
+
+WHERE
+
+   a.INSURED_ID = :P_INSURED_ID]]>
+      </select>
+      <displayInfo x="0.41663" y="2.03125" width="1.52075" height="0.58325"/>
+      <group name="G_SURNAME1">
+        <displayInfo x="0.26843" y="2.72900" width="1.80444" height="0.77246"
+        />
+        <dataItem name="DATE_OF_BIRTH1" datatype="date" oracleDatatype="date"
+         columnOrder="99" width="9" defaultWidth="90000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Date Of Birth1">
+          <dataDescriptor expression="a.DATE_OF_BIRTH"
+           descriptiveExpression="DATE_OF_BIRTH" order="6" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="DATE_OF_DEATH" datatype="date" oracleDatatype="date"
+         columnOrder="100" width="9" defaultWidth="90000"
+         defaultHeight="10000" columnFlags="1" defaultLabel="Date Of Death">
+          <dataDescriptor expression="a.DATE_OF_DEATH"
+           descriptiveExpression="DATE_OF_DEATH" order="7" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="FATHER_NAME1" datatype="vchar2" columnOrder="93"
+         width="30" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Father Name1">
+          <dataDescriptor expression="a.FATHER_NAME"
+           descriptiveExpression="FATHER_NAME" order="3" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="MOTHER_NAME1" datatype="vchar2" columnOrder="94"
+         width="30" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Mother Name1">
+          <dataDescriptor expression="a.MOTHER_NAME"
+           descriptiveExpression="MOTHER_NAME" order="4" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="INSURED_ID1" datatype="vchar2" columnOrder="95"
+         width="9" defaultWidth="90000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Insured Id1">
+          <dataDescriptor expression="a.INSURED_ID"
+           descriptiveExpression="INSURED_ID" order="5" width="9"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="SURNAME1" datatype="vchar2" columnOrder="91"
+         width="50" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Surname1">
+          <dataDescriptor expression="a.SURNAME"
+           descriptiveExpression="SURNAME" order="1" width="50"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="NAME1" datatype="vchar2" columnOrder="92" width="30"
+         defaultWidth="100000" defaultHeight="10000" columnFlags="1"
+         defaultLabel="Name1">
+          <dataDescriptor expression="a.NAME" descriptiveExpression="NAME"
+           order="2" width="30"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+      </group>
+    </dataSource>
+    <dataSource name="Q_18">
+      <select>
+      <![CDATA[SELECT 
+ 
+    DECODE(a.DEPENDENCY_TYPE,'00002','ΧΗΡΑ:','00003','ΠΑΙΔΙ:','00005','ΜΗΤΕΡΑ:','00004','ΠΑΤΕΡΑΣ:') DEPENDENCY_TYPE_DESCR,
+    b.SURNAME ||  ' ' || b.NAME FULLNAME
+   
+FROM 
+     PEN_DECISION_INSTANCE_DEATH a,
+     REG_INSURED b,
+     PEN_DECISION_INSTANCE c    
+
+WHERE
+
+  a.GROUP_ID = :P_GROUP_ID AND
+
+  (a.DEPENDENCY_TYPE = '00002' OR
+  a.DEPENDENCY_TYPE = '00005' OR
+  a.DEPENDENCY_TYPE = '00004') AND
+
+  a.DT_DECISION_YEAR  = c.DT_DECISION_YEAR AND 
+  a.DT_DEC_UNIT_CODE = c.DT_DEC_UNIT_CODE AND
+  a.DEC_INCR_SEQ_NO = c.DEC_INCR_SEQ_NO AND 
+  a.DT_DOCUMENT_TYPE_DEC_CODE = c.DT_DOCUMENT_TYPE_DEC_CODE AND
+  c.DECISION_STATE_FLG = '1' AND
+
+  a.INSURED_ID = b.INSURED_ID]]>
+      </select>
+      <displayInfo x="19.66663" y="1.94788" width="2.05212" height="0.30420"/>
+      <group name="G_DEPENDENCY_TYPE1">
+        <displayInfo x="19.56030" y="2.63745" width="2.16089" height="1.11426"
+        />
+        <dataItem name="DEPENDENCY_TYPE_DESCR1" datatype="vchar2"
+         columnOrder="101" width="8" defaultWidth="80000"
+         defaultHeight="10000" columnFlags="1"
+         defaultLabel="Dependency Type Descr1">
+          <dataDescriptor
+           expression="DECODE ( a.DEPENDENCY_TYPE , &apos;00002&apos; , &apos;ΧΗΡΑ:&apos; , &apos;00003&apos; , &apos;ΠΑΙΔΙ:&apos; , &apos;00005&apos; , &apos;ΜΗΤΕΡΑ:&apos; , &apos;00004&apos; , &apos;ΠΑΤΕΡΑΣ:&apos; )"
+           descriptiveExpression="DEPENDENCY_TYPE_DESCR" order="1" width="8"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <dataItem name="FULLNAME2" datatype="vchar2" columnOrder="102"
+         width="81" defaultWidth="100000" defaultHeight="10000"
+         columnFlags="1" defaultLabel="Fullname2">
+          <dataDescriptor expression="b.SURNAME || &apos; &apos; || b.NAME"
+           descriptiveExpression="FULLNAME" order="2" width="81"/>
+          <dataItemPrivate adtName="" schemaName=""/>
+        </dataItem>
+        <summary name="CS_3" source="DEPENDENCY_TYPE_DESCR1" function="count"
+         width="14" precision="12" reset="report" compute="report"
+         defaultWidth="0" defaultHeight="0" columnFlags="8">
+          <displayInfo x="0.00000" y="0.00000" width="0.00000"
+           height="0.00000"/>
+        </summary>
+      </group>
+    </dataSource>
+    <formula name="CF_2" source="cf_2formula" datatype="number" width="22"
+     precision="20" defaultWidth="0" defaultHeight="0" columnFlags="16"
+     breakOrder="none">
+      <displayInfo x="3.14587" y="3.56250" width="1.45825" height="0.20837"/>
+    </formula>
+    <summary name="CS_4" source="value_2" function="sum" width="22"
+     precision="20" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="2.38538" y="3.23962" width="0.79993" height="0.19995"/>
+    </summary>
+    <summary name="CS_1" source="value_1" function="sum" width="22"
+     precision="20" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="3.43774" y="3.23975" width="0.79993" height="0.19995"/>
+    </summary>
+    <summary name="CS_2" source="value_3" function="sum" width="22"
+     precision="20" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="4.56250" y="3.16675" width="0.80212" height="0.19995"/>
+    </summary>
+    <summary name="CS_5" source="YEAR" function="sum" width="14"
+     precision="12" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="0.98962" y="5.60425" width="0.79993" height="0.20837"/>
+    </summary>
+    <summary name="CS_6" source="MONTH" function="sum" width="14"
+     precision="12" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="1.67700" y="5.59375" width="0.79993" height="0.20837"/>
+    </summary>
+    <summary name="CS_7" source="INSURANCE_DAYS_QUAL_FINAL" function="sum"
+     width="14" precision="12" reset="report" compute="report"
+     defaultWidth="0" defaultHeight="0" columnFlags="8">
+      <displayInfo x="2.39587" y="5.61487" width="0.79993" height="0.19995"/>
+    </summary>
+    <summary name="CS_8" source="YEAR1" function="sum" width="14"
+     precision="12" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="4.04163" y="5.64575" width="0.79993" height="0.19995"/>
+    </summary>
+    <summary name="CS_9" source="MONTH1" function="sum" width="14"
+     precision="12" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="4.89587" y="5.64587" width="0.79993" height="0.19995"/>
+    </summary>
+    <summary name="CS_10" source="INSURANCE_DAYS_QUAL_FINAL1" function="sum"
+     width="14" precision="12" reset="report" compute="report"
+     defaultWidth="0" defaultHeight="0" columnFlags="8">
+      <displayInfo x="5.75000" y="5.65625" width="0.79993" height="0.22913"/>
+    </summary>
+    <formula name="CF_3" source="cf_3formula" datatype="number" width="14"
+     precision="12" defaultWidth="0" defaultHeight="0" columnFlags="16"
+     breakOrder="none">
+      <displayInfo x="2.32324" y="5.93799" width="0.79993" height="0.20825"/>
+    </formula>
+    <formula name="CF_4" source="cf_4formula" datatype="number" width="14"
+     precision="12" defaultWidth="0" defaultHeight="0" columnFlags="16"
+     breakOrder="none">
+      <displayInfo x="3.18787" y="5.94849" width="0.79993" height="0.19995"/>
+    </formula>
+    <formula name="CF_5" source="cf_5formula" datatype="number" width="14"
+     precision="12" defaultWidth="0" defaultHeight="0" columnFlags="16"
+     breakOrder="none">
+      <displayInfo x="4.04199" y="5.96924" width="0.79993" height="0.19995"/>
+    </formula>
+    <summary name="CS_12" source="CS_3" function="last" width="14"
+     precision="12" reset="report" compute="report" defaultWidth="0"
+     defaultHeight="0" columnFlags="8">
+      <displayInfo x="19.73962" y="3.91663" width="0.79993" height="0.19995"/>
+    </summary>
+    <link parentGroup="G_MONTH1" parentColumn="INSHISTYP_TRANS_TYPE1"
+     childQuery="Q_15" childColumn="TRANS_TYPE" condition="eq"
+     sqlClause="where"/>
+  </data>
+  <layout>
+    <rulers numberOfSnapPoints="8"/>
+  <section name="header" width="10.00000" widthInChar="120">
+    <body width="9.00000"/>
+  </section>
+  <section name="trailer" width="10.00000" widthInChar="120">
+    <body width="9.00000"/>
+  </section>
+  <section name="main" width="10.00000" widthInChar="120">
+    <body width="9.99902" height="8.29175">
+      <location x="0.00098" y="2.37500"/>
+      <repeatingFrame name="R_1" source="G_BRANCH_DOMAIN_TYPE"
+       printDirection="down" minWidowRecords="1" columnMode="no">
+        <geometryInfo x="0.24988" y="0.00012" width="9.75012" height="1.83325"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_9" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.33313" y="0.16663" width="1.66687"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[1. Ο Διευθυντής του]]>
+            </string>
+          </textSegment>
+        </text>
+        <field name="F_7" source="CF_1" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="1.99963" y="0.16663" width="0.33325"
+           height="0.16675"/>
+          <generalLayout horizontalElasticity="variable"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <text name="B_10" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="2.41626" y="0.16663" width="1.66663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Υποκ/τος του Ι.Κ.Α.]]>
+            </string>
+          </textSegment>
+        </text>
+        <field name="F_1" source="BRANCH_NAME" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="4.08289" y="0.16663" width="0.83325"
+           height="0.16675"/>
+          <generalLayout horizontalElasticity="variable"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <text name="B_41" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="4.91626" y="0.16663" width="1.83374"
+           height="0.15625"/>
+          <textSegment>
+            <font face="Courier New" size="9"/>
+            <string>
+            <![CDATA[, αρμόδιος να κρίνει  ]]>
+            </string>
+          </textSegment>
+        </text>
+        <field name="F_2" source="P_APPL_INCR_SEQ_NO" minWidowLines="1"
+         spacing="0" alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.24280" y="0.33337" width="0.58337"
+           height="0.16675"/>
+          <generalLayout horizontalElasticity="variable"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <text name="B_42" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="2.91650" y="0.33337" width="1.66675"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[με αίτημα απονομής]]>
+            </string>
+          </textSegment>
+        </text>
+        <field name="F_42" source="PROCUCT_DESCRIPTION" minWidowLines="1"
+         spacing="0" alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="4.51270" y="0.33337" width="2.07056"
+           height="0.16663"/>
+          <generalLayout horizontalElasticity="variable"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <text name="B_60" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="6.66663" y="0.33337" width="1.75000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="9"/>
+            <string>
+            <![CDATA[του δικαιούχου μέλους ]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_11" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.57068" y="0.50000" width="1.83325"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[με τα κάτωθι στοιχεία]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_12" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58313" y="0.83325" width="0.66663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Επώνυμο:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_13" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58313" y="0.99988" width="0.50000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Όνομα:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_14" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58313" y="1.16663" width="1.08337"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Πατρώνυμνο:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_15" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58313" y="1.33325" width="1.25000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Μητρώνυμο:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_16" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58337" y="1.49988" width="0.41663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Α.Μ.:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_17" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58337" y="1.66663" width="1.91663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Νομικό Πρόσωπο Εξόδου:]]>
+            </string>
+          </textSegment>
+        </text>
+        <field name="F_3" source="SURNAME" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58228" y="0.83325" width="2.58362"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_4" source="NAME" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58264" y="1.00000" width="2.58325"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_5" source="FATHER_NAME" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58264" y="1.16663" width="2.58325"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_6" source="MOTHER_NAME" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58264" y="1.33325" width="2.58325"
+           height="0.16675"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_8" source="INSURED_ID" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58264" y="1.50000" width="2.25000"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <repeatingFrame name="R_2" source="G_VALUE" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="2.58337" y="1.66602" width="3.41663"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_9" source="FULLNAME" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="2.60413" y="1.68774" width="2.75000"
+             height="0.12500"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+        <text name="B_21" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58313" y="0.33337" width="1.58350"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="9"/>
+            <string>
+            <![CDATA[τη με Αριθμό Αίτηση]]>
+            </string>
+          </textSegment>
+        </text>
+      </repeatingFrame>
+      <text name="B_45" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="7.24829" y="3.66626" width="0.33398" height="0.15625"
+        />
+        <textSegment>
+          <font face="Courier New" size="9"/>
+          <string>
+          <![CDATA[ΈΤΗ]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_44" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="7.91492" y="3.66626" width="0.50073" height="0.15625"
+        />
+        <textSegment>
+          <font face="Courier New" size="9"/>
+          <string>
+          <![CDATA[ΜΗΝΕΣ]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_43" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="8.58167" y="3.66626" width="0.66724" height="0.15625"
+        />
+        <textSegment>
+          <font face="Courier New" size="9"/>
+          <string>
+          <![CDATA[ΗΜΕΡΕΣ]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_6" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="7.16638" y="3.83289" width="2.16663" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[--------------------------]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_61" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="0.58313" y="2.00000" width="4.33325" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[που προέκυψε από τον θανόντα με τα κάτωθι στοιχεία]]>
+          </string>
+        </textSegment>
+      </text>
+      <repeatingFrame name="R_20" source="G_SURNAME1" printDirection="down"
+       minWidowRecords="1" columnMode="no">
+        <geometryInfo x="0.25000" y="2.16675" width="6.83337" height="0.99988"
+        />
+        <visualSettings linePattern="solid"/>
+        <text name="B_62" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58313" y="2.33337" width="0.66663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Επώνυμο:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_63" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58337" y="2.50000" width="0.50000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Όνομα:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_64" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58337" y="2.66663" width="0.91663"
+           height="0.16675"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Πατρώνυμο:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_65" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58337" y="2.83337" width="0.83337"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Μητρώνυμο:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_66" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.58337" y="3.00000" width="0.41663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Α.Μ.:]]>
+            </string>
+          </textSegment>
+        </text>
+        <field name="F_41" source="FATHER_NAME1" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58337" y="2.66663" width="2.83325"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_53" source="SURNAME1" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58337" y="2.33337" width="2.83325"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_54" source="NAME1" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58337" y="2.50000" width="2.83325"
+           height="0.16675"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_55" source="MOTHER_NAME1" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58337" y="2.83337" width="2.83325"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <field name="F_56" source="INSURED_ID1" minWidowLines="1" spacing="0"
+         alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="2.58337" y="3.00000" width="2.50000"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+      </repeatingFrame>
+      <text name="B_18" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="0.33325" y="3.33276" width="6.16650" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[2. Έχοντας υπόψη τα στοιχεία του φακέλου από τα οποία προκύπτουν τα εξής:]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_19" minWidowLines="1">
+        <textSettings spacing="0"/>
+        <geometryInfo x="0.33313" y="3.66614" width="2.16663" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10" underline="yes"/>
+          <string>
+          <![CDATA[Α' ΣΥΝΤΑΞΙΜΟΣ ΧΡΟΝΟΣ]]>
+          </string>
+        </textSegment>
+      </text>
+      <frame name="M_2">
+        <geometryInfo x="0.25000" y="3.99951" width="9.66663" height="0.33325"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <repeatingFrame name="R_13" source="G_MONTH" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.41650" y="3.99951" width="9.25000"
+           height="0.16675"/>
+          <generalLayout verticalElasticity="expand"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_47" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.49988" y="3.99951" width="3.83325"
+             height="0.16675"/>
+            <textSegment>
+              <font face="Courier New" size="9"/>
+              <string>
+              <![CDATA[Πραγματική Ασφάλιση στο ΕΤΕΑΜ           από:]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_30" source="FROM_WORKING_DATE" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="4.41467" y="3.99951" width="0.83325"
+             height="0.16675"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <text name="B_46" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="5.40393" y="3.99951" width="0.54297"
+             height="0.15625"/>
+            <textSegment>
+              <font face="Courier New" size="9"/>
+              <string>
+              <![CDATA[μέχρι]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_29" source="TO_WORKING_DATE" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="5.99768" y="3.99951" width="0.83337"
+             height="0.16675"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_28" source="YEAR" minWidowLines="1" spacing="0"
+           alignment="center">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="7.09192" y="3.99951" width="0.58337"
+             height="0.16675"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_27" source="MONTH" minWidowLines="1" spacing="0"
+           alignment="center">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="7.92529" y="3.99951" width="0.41675"
+             height="0.16675"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_26" source="INSURANCE_DAYS_QUAL_FINAL"
+           minWidowLines="1" spacing="0" alignment="center">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="8.59216" y="3.99951" width="0.50000"
+             height="0.16675"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_1">
+        <geometryInfo x="0.41895" y="4.35315" width="9.24756" height="0.35522"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_48" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.51001" y="4.35437" width="2.94812"
+           height="0.15625"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Αναγνωρίσεις:]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_16" source="G_MONTH1" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.59924" y="4.47913" width="9.03601"
+           height="0.20789"/>
+          <generalLayout verticalElasticity="expand"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_37" source="FROM_WORKING_DATE1" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="4.42456" y="4.50061" width="0.86597"
+             height="0.12390"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <text name="B_49" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="5.41418" y="4.50061" width="0.49500"
+             height="0.14465"/>
+            <textSegment>
+              <font face="Courier New" size="9"/>
+              <string>
+              <![CDATA[μέχρι]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_36" source="TO_WORKING_DATE1" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="6.11609" y="4.50061" width="0.82520"
+             height="0.12390"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_35" source="YEAR1" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="7.37463" y="4.49988" width="0.57764"
+             height="0.12463"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_34" source="MONTH1" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="8.11731" y="4.50037" width="0.39282"
+             height="0.12415"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_33" source="INSURANCE_DAYS_QUAL_FINAL1"
+           minWidowLines="1" spacing="0" alignment="start">
+            <font face="Courier New" size="9"/>
+            <geometryInfo x="8.73499" y="4.50037" width="0.49500"
+             height="0.10339"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <repeatingFrame name="R_15" source="G_TRANS_DESCR"
+           printDirection="down" minWidowRecords="1" columnMode="no">
+            <geometryInfo x="0.63525" y="4.50024" width="3.61462"
+             height="0.16602"/>
+            <generalLayout verticalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+            <field name="F_32" source="TRANS_DESCR" minWidowLines="1"
+             spacing="0" alignment="start">
+              <font face="Courier New" size="9"/>
+              <geometryInfo x="0.68872" y="4.52112" width="2.79517"
+               height="0.08337"/>
+              <advancedLayout formatTrigger="f_32formattrigger"/>
+              <visualSettings linePattern="solid"/>
+            </field>
+            <text name="B_50" minWidowLines="1">
+              <textSettings spacing="0"/>
+              <geometryInfo x="3.83289" y="4.52026" width="0.33362"
+               height="0.10425"/>
+              <textSegment>
+                <font face="Courier New" size="9"/>
+                <string>
+                <![CDATA[από:]]>
+                </string>
+              </textSegment>
+            </text>
+          </repeatingFrame>
+        </repeatingFrame>
+      </frame>
+      <field name="F_52" source="CF_3" minWidowLines="1" spacing="0"
+       alignment="start">
+        <font face="Courier New" size="9"/>
+        <geometryInfo x="7.33337" y="4.83301" width="0.58325" height="0.16663"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+      <text name="B_35" minWidowLines="1">
+        <textSettings justify="end" spacing="0"/>
+        <geometryInfo x="3.50000" y="4.83301" width="3.58337" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="9"/>
+          <string>
+          <![CDATA[Συνολική Σύνταξιμη Υπηρεσία:]]>
+          </string>
+        </textSegment>
+      </text>
+      <field name="F_51" source="CF_4" minWidowLines="1" spacing="0"
+       alignment="start">
+        <font face="Courier New" size="9"/>
+        <geometryInfo x="8.07300" y="4.83301" width="0.58325" height="0.16663"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+      <field name="F_50" source="CF_5" minWidowLines="1" spacing="0"
+       alignment="start">
+        <font face="Courier New" size="9"/>
+        <geometryInfo x="8.82275" y="4.83301" width="0.58337" height="0.16663"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+      <frame name="M_12">
+        <geometryInfo x="0.16626" y="5.18628" width="9.66711" height="1.29163"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_25" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.29175" y="5.18628" width="1.83337"
+           height="0.12500"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[Β' ΣΥΝΤΑΞΙΜΕΣ ΑΠΟΔΟΧΕΣ]]>
+            </string>
+          </textSegment>
+        </text>
+        <frame name="M_14">
+          <geometryInfo x="0.62500" y="5.93628" width="9.20813"
+           height="0.25000"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_4" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.75000" y="5.95740" width="2.55212"
+             height="0.16675"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[’λλες συντάξιμες Αποδοχές:]]>
+              </string>
+            </textSegment>
+          </text>
+          <repeatingFrame name="R_5" source="G_VALUE1" printDirection="down"
+           minWidowRecords="1" columnMode="no">
+            <geometryInfo x="3.67920" y="5.95691" width="2.51868"
+             height="0.20850"/>
+            <visualSettings linePattern="solid"/>
+            <field name="F_10" source="CS_2" minWidowLines="1"
+             formatMask="NGNNNGNNNGNNNGNN0DN0" spacing="0" alignment="end">
+              <font face="Courier New" size="10"/>
+              <geometryInfo x="3.87146" y="5.99890" width="1.86121"
+               height="0.14539"/>
+              <advancedLayout formatTrigger="f_10formattrigger"/>
+              <visualSettings linePattern="solid"/>
+            </field>
+          </repeatingFrame>
+          <field name="F_12" source="P_SALARY" minWidowLines="1"
+           formatMask="NGNNNGNNNGNNNGNN0DN0" spacing="0" alignment="end">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="3.43750" y="5.97913" width="2.29163"
+             height="0.18628"/>
+            <advancedLayout formatTrigger="f_12formattrigger"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </frame>
+        <frame name="M_13">
+          <geometryInfo x="0.61487" y="6.24854" width="5.55176"
+           height="0.20850"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_20" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.77112" y="6.26990" width="2.12476"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[Σύνολο Αποδοχών:]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_11" source="CF_2" minWidowLines="1"
+           formatMask="NGNNNGNNNGNNNGNN0DN0" spacing="0" alignment="end">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="3.33630" y="6.26990" width="2.40942"
+             height="0.16663"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </frame>
+        <frame name="M_15">
+          <geometryInfo x="0.63550" y="5.39417" width="9.07288"
+           height="0.25000"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_5" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.76050" y="5.45654" width="2.20837"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[Βασικός μισθός:]]>
+              </string>
+            </textSegment>
+          </text>
+          <repeatingFrame name="R_4" source="G_FULLNAME1"
+           printDirection="down" minWidowRecords="1" columnMode="no">
+            <geometryInfo x="3.14624" y="5.43616" width="3.03088"
+             height="0.16724"/>
+            <visualSettings linePattern="solid"/>
+            <field name="F_13" source="CS_4" minWidowLines="1"
+             formatMask="NGNNNGNNNGNNNGNN0DN0" spacing="0" alignment="end">
+              <font face="Courier New" size="10"/>
+              <geometryInfo x="3.38574" y="5.43665" width="2.34387"
+               height="0.16663"/>
+              <visualSettings linePattern="solid"/>
+            </field>
+          </repeatingFrame>
+        </frame>
+        <frame name="M_16">
+          <geometryInfo x="0.62512" y="5.66528" width="9.14575"
+           height="0.22913"/>
+          <visualSettings linePattern="solid"/>
+          <repeatingFrame name="R_3" source="G_VALUE1" printDirection="down"
+           minWidowRecords="1" columnMode="no">
+            <geometryInfo x="3.12537" y="5.68616" width="3.05176"
+             height="0.18750"/>
+            <visualSettings linePattern="solid"/>
+            <field name="F_25" source="CS_1" minWidowLines="1"
+             formatMask="NGNNNGNNNGNNNGNN0DN0" spacing="0" alignment="end">
+              <font face="Courier New" size="10"/>
+              <geometryInfo x="3.34155" y="5.68665" width="2.38806"
+               height="0.16663"/>
+              <visualSettings linePattern="solid"/>
+            </field>
+          </repeatingFrame>
+          <text name="B_3" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.75000" y="5.70740" width="2.20886"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[Επίδομα Χρόνου Υπηρεσίας:]]>
+              </string>
+            </textSegment>
+          </text>
+        </frame>
+      </frame>
+      <frame name="M_5">
+        <geometryInfo x="0.16663" y="6.56653" width="9.75000" height="0.74597"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_26" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.29163" y="6.69153" width="2.66663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[Γ' ΑΙΤΙΑ ΕΞΟΔΟΥ ΑΠΟ ΤΗΝ ΥΠΗΡΕΣΙΑ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_6" source="G_EXIT_CAUSE" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.79114" y="7.02490" width="2.91663"
+           height="0.16663"/>
+          <generalLayout horizontalElasticity="expand"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_14" source="EXIT_CAUSE_DESCR" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.87451" y="7.02490" width="2.50000"
+             height="0.16663"/>
+            <generalLayout horizontalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_6">
+        <geometryInfo x="0.16663" y="7.37744" width="9.75000" height="0.83337"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_27" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.29163" y="7.50244" width="2.91663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[Δ' ΑΠΟΦΑΣΗ ΑΠΟΝΟΜΗΣ ΚΥΡΙΑΣ ΣΥΝΤΑΞΗΣ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_7" source="G_DEC_NO" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.79175" y="7.83582" width="2.91663"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_15" source="VALUE" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.87512" y="7.83582" width="2.50000"
+             height="0.16663"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_19">
+        <geometryInfo x="0.16663" y="8.50208" width="9.75000" height="0.16675"
+        />
+        <visualSettings linePattern="solid"/>
+        <text name="B_51" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.25000" y="8.50208" width="2.08337"
+           height="0.16675"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Αιτία Συνταξιοδότησης: ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_14" source="G_PENSION_CAUSE"
+         printDirection="down" minWidowRecords="1" columnMode="no">
+          <geometryInfo x="2.16663" y="8.50208" width="7.66675"
+           height="0.16675"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_43" source="EXIT_CAUSE_DESCR1" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="2.25000" y="8.50208" width="2.50000"
+             height="0.16675"/>
+            <generalLayout verticalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_7">
+        <geometryInfo x="0.16663" y="8.81445" width="9.75000" height="0.83337"
+        />
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_28" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.29163" y="8.98096" width="4.83337"
+           height="0.16675"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[Ε' ΗΜΕΡΟΜΗΝΙΑ ΚΟΙΝΟΠΟΙΗΣΗΣ ΑΠΟΦΑΣΗΣ ΚΥΡΙΑΣ ΣΥΝΤΑΞΗΣ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_8" source="G_COMMIT_DATE"
+         printDirection="down" minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.70825" y="9.29358" width="2.58313"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_16" source="TO_DATE_a_VALUE_DD_MM_RRRR"
+           minWidowLines="1" spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.79163" y="9.29358" width="2.25000"
+             height="0.16663"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_8">
+        <geometryInfo x="0.16663" y="9.77625" width="7.16675" height="0.62524"
+        />
+        <visualSettings linePattern="solid"/>
+        <text name="B_29" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.29163" y="9.81824" width="3.00000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[ΣΤ' ΕΝΑΡΞΗ ΚΑΤΑΒΟΛΗΣ ΚΥΡΙΑΣ ΣΥΝΤΑΞΗΣ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_9" source="G_PAYMENT" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.70825" y="10.08850" width="2.58325"
+           height="0.16675"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_17" source="TO_DATE_a_VALUE_DD_MM_RRRR1"
+           minWidowLines="1" spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.79150" y="10.08850" width="2.33337"
+             height="0.16675"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_9">
+        <geometryInfo x="0.16663" y="10.54675" width="9.75000"
+         height="0.64294"/>
+        <visualSettings linePattern="solid"/>
+        <field name="F_18" source="P_ACC_START_DATE" minWidowLines="1"
+         spacing="0" alignment="start">
+          <font face="Courier New" size="10"/>
+          <geometryInfo x="0.79138" y="10.98376" width="1.08337"
+           height="0.16663"/>
+          <visualSettings linePattern="solid"/>
+        </field>
+        <text name="B_30" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.32288" y="10.65088" width="2.08337"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[H' ΕΝΑΡΞΗ ΚΑΤΑΒΟΛΗΣ ΕΤΕΑΜ]]>
+            </string>
+          </textSegment>
+        </text>
+      </frame>
+      <frame name="M_20">
+        <geometryInfo x="0.16663" y="11.33545" width="9.75000"
+         height="1.00000"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_52" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.33337" y="11.33545" width="1.91663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[Θ' ΣΤΟΙΧΕΙΑ ΥΠΟΛΟΓΙΣΜΟΥ]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_53" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.41663" y="11.66882" width="3.00000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Χρόνος Γέννησης:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_54" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.41663" y="11.83545" width="3.00000"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Χρονολογία Θανάτού:]]>
+            </string>
+          </textSegment>
+        </text>
+        <text name="B_55" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.41663" y="12.00208" width="3.08337"
+           height="0.16675"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Χρονολογία Θεμελίωσης Δικαιώματος:]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_17" source="G_SURNAME1" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="3.33325" y="11.66882" width="6.58337"
+           height="0.50000"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_44" source="DATE_OF_BIRTH1" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="3.41663" y="11.66882" width="1.25000"
+             height="0.16663"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_45" source="DATE_OF_DEATH" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="3.41663" y="11.83545" width="1.25000"
+             height="0.16663"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_21">
+        <geometryInfo x="0.16663" y="12.50208" width="9.75000"
+         height="0.83337"/>
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_56" minWidowLines="1">
+          <textSettings justify="center" spacing="0"/>
+          <geometryInfo x="1.08325" y="12.50208" width="1.16663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[ΔΙΚΑΙΟΔΟΧΟΙ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_18" source="G_DEPENDENCY_TYPE1"
+         printDirection="down" minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.21875" y="12.81262" width="9.63538"
+           height="0.20850"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_57" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.59338" y="12.83679" width="0.08337"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[.]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_47" source="DEPENDENCY_TYPE_DESCR1" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.77026" y="12.83679" width="0.79187"
+             height="0.14587"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_46" source="CS_3" minWidowLines="1" spacing="0"
+           alignment="end">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.34338" y="12.83691" width="0.24988"
+             height="0.14563"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_48" source="FULLNAME2" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="1.66663" y="12.83350" width="2.66675"
+             height="0.16663"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+        <repeatingFrame name="R_19" source="G_INS_INSURED_ID_INDIRECT"
+         printDirection="down" minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.22913" y="13.04163" width="9.63538"
+           height="0.18750"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_58" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.78125" y="13.04187" width="0.73962"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[ΠΑΙΔΙ:]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_49" source="NAME2" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="1.66663" y="13.06238" width="2.25000"
+             height="0.12500"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <text name="B_59" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="4.09448" y="13.04175" width="0.33337"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[ΓΕΝ:]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_57" source="DATE_OF_BIRTH2" minWidowLines="1"
+           spacing="0" alignment="end">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="4.47998" y="13.06262" width="0.93713"
+             height="0.12488"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_58" source="CF_6" minWidowLines="1" spacing="0"
+           alignment="end">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.36450" y="13.06226" width="0.22913"
+             height="0.12512"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+        <text name="B_67" minWidowLines="1">
+          <textSettings justify="end" spacing="0"/>
+          <geometryInfo x="0.58337" y="13.06262" width="0.09412"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[.]]>
+            </string>
+          </textSegment>
+        </text>
+      </frame>
+      <frame name="M_17">
+        <geometryInfo x="0.16663" y="13.54553" width="9.75000"
+         height="0.33337"/>
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <repeatingFrame name="R_10" source="G_TXT_DESCR" printDirection="down"
+         minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.29163" y="13.67053" width="9.58325"
+           height="0.16724"/>
+          <generalLayout verticalElasticity="expand"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_19" source="TXT_DESCR" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.45813" y="13.67090" width="9.41663"
+             height="0.16663"/>
+            <generalLayout verticalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_10">
+        <geometryInfo x="0.16663" y="14.06689" width="9.75000"
+         height="0.83337"/>
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_31" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.45813" y="14.17151" width="1.83337"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10" underline="yes"/>
+            <string>
+            <![CDATA[ΥΠΟΛΟΓΙΣΜΟΣ ΣΥΝΤΑΞΗΣ]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_11" source="G_AMOUNT_DESCR"
+         printDirection="down" minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.37488" y="14.50488" width="6.66675"
+           height="0.16663"/>
+          <generalLayout verticalElasticity="expand"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_21" source="AMOUNT_DESCR" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.45825" y="14.50488" width="1.41663"
+             height="0.16663"/>
+            <generalLayout horizontalElasticity="variable"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_20" source="AMOUNT" minWidowLines="1"
+           formatMask="9G999G999G999G990D90" spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="1.95898" y="14.50488" width="0.99988"
+             height="0.16663"/>
+            <generalLayout horizontalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_11">
+        <geometryInfo x="0.16663" y="16.66541" width="9.75000"
+         height="0.16663"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_32" minWidowLines="1">
+          <textSettings justify="center" spacing="0"/>
+          <geometryInfo x="0.33301" y="16.66541" width="7.00000"
+           height="0.16663"/>
+          <generalLayout pageBreakBefore="yes"/>
+          <textSegment>
+            <font face="Courier New" size="9" bold="yes"/>
+            <string>
+            <![CDATA[ΜΕ ΒΑΣΗ ΤΑ ΑΝΩΤΕΡΩ]]>
+            </string>
+          </textSegment>
+        </text>
+      </frame>
+      <frame name="M_4">
+        <geometryInfo x="0.16663" y="16.99817" width="9.75000"
+         height="0.52197"/>
+        <generalLayout verticalElasticity="expand"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_33" minWidowLines="1">
+          <textSettings justify="center" spacing="0"/>
+          <geometryInfo x="0.29163" y="16.99854" width="1.20837"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Απονέμουμε:]]>
+            </string>
+          </textSegment>
+        </text>
+        <repeatingFrame name="R_12" source="G_TXT_DESCR1"
+         printDirection="down" minWidowRecords="1" columnMode="no">
+          <geometryInfo x="0.37500" y="17.16528" width="6.95825"
+           height="0.16663"/>
+          <generalLayout verticalElasticity="expand"/>
+          <visualSettings linePattern="solid"/>
+          <field name="F_22" source="TXT_DESCR1" minWidowLines="1" spacing="0"
+           alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="0.45813" y="17.16528" width="5.50000"
+             height="0.16663"/>
+            <generalLayout verticalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </repeatingFrame>
+      </frame>
+      <frame name="M_3">
+        <geometryInfo x="0.16663" y="17.64587" width="9.75000"
+         height="1.83337"/>
+        <visualSettings linePattern="solid"/>
+        <text name="B_36" minWidowLines="1">
+          <textSettings justify="center" spacing="0"/>
+          <geometryInfo x="6.91663" y="18.14453" width="1.41663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[Ο ΔΙΕΥΘΥΝΤΗΣ]]>
+            </string>
+          </textSegment>
+        </text>
+        <frame name="M_18">
+          <geometryInfo x="0.25000" y="17.97791" width="6.33337"
+           height="0.66675"/>
+          <visualSettings linePattern="solid"/>
+          <text name="B_24" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.41675" y="17.97803" width="1.50000"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[1. ΕΝΔΙΑΦΕΡΟΜΕΝΟ:]]>
+              </string>
+            </textSegment>
+          </text>
+          <text name="B_23" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.41675" y="18.14465" width="0.83337"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[2. ΤΑΜΕΙΟ:]]>
+              </string>
+            </textSegment>
+          </text>
+          <text name="B_22" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.41675" y="18.31128" width="1.58337"
+             height="0.16675"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[3. ΔΗΜΟΤΙΚΗ ΑΡΧΗ:]]>
+              </string>
+            </textSegment>
+          </text>
+          <text name="B_7" minWidowLines="1">
+            <textSettings spacing="0"/>
+            <geometryInfo x="0.41675" y="18.47803" width="1.58337"
+             height="0.16663"/>
+            <textSegment>
+              <font face="Courier New" size="10"/>
+              <string>
+              <![CDATA[4. ΑΣΤΥΝΟΜΙΚΗ ΑΡΧΗ:]]>
+              </string>
+            </textSegment>
+          </text>
+          <field name="F_24" source="P_INSURED_SURNAME" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="2.08325" y="17.97803" width="0.91663"
+             height="0.16663"/>
+            <generalLayout horizontalElasticity="variable"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+          <field name="F_23" source="P_INSURED_NAME" minWidowLines="1"
+           spacing="0" alignment="start">
+            <font face="Courier New" size="10"/>
+            <geometryInfo x="3.08325" y="17.97803" width="1.08337"
+             height="0.16663"/>
+            <generalLayout horizontalElasticity="expand"/>
+            <visualSettings linePattern="solid"/>
+          </field>
+        </frame>
+        <text name="B_34" minWidowLines="1">
+          <textSettings spacing="0"/>
+          <geometryInfo x="0.41663" y="17.81128" width="0.91663"
+           height="0.16663"/>
+          <textSegment>
+            <font face="Courier New" size="10"/>
+            <string>
+            <![CDATA[ΚΟΙΝΟΠΟΙΗΣΗ]]>
+            </string>
+          </textSegment>
+        </text>
+      </frame>
+    </body>
+    <margin>
+      <text name="B_2" minWidowLines="1">
+        <textSettings spacing="single"/>
+        <geometryInfo x="0.10864" y="0.00061" width="3.50623" height="0.33276"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[ΕΛΛΗΝΙΚΗ ΔΗΜΟΚΡΑΤΙΑ 
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[ΙΔΡΥΜΑ ΚΟΙΝΩΝΙΚΩΝ ΑΣΦΑΛΙΣΕΩΝ 
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[
+]]>
+          </string>
+        </textSegment>
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[
+]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_1" minWidowLines="1">
+        <textSettings spacing="single"/>
+        <geometryInfo x="0.15015" y="0.50000" width="1.17761" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[ΥΠΟΚΑΤΑΣΤΗΜΑ :]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_8" minWidowLines="1">
+        <textSettings spacing="single"/>
+        <geometryInfo x="7.48596" y="0.00061" width="0.76440" height="0.17090"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[ΑΘΗΝΑ,]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_39" minWidowLines="1">
+        <textSettings justify="center" spacing="0"/>
+        <geometryInfo x="0.16663" y="1.83337" width="9.75000" height="0.34375"
+        />
+        <advancedLayout formatTrigger="b_39formattrigger"/>
+        <textSegment>
+          <font face="Courier New" size="14" bold="yes" underline="yes"/>
+          <string>
+          <![CDATA[ΑΠΟΦΑΣΗ  ΔΙΕΥΘΥΝΤΗ]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_40" minWidowLines="1">
+        <textSettings spacing="single"/>
+        <geometryInfo x="0.16663" y="0.66931" width="0.58325" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[Τμήμα:]]>
+          </string>
+        </textSegment>
+      </text>
+      <field name="F_DATE1" source="CurrentDate" minWidowLines="1"
+       formatMask="DD-MON-RR HH24:MI:SS" spacing="0" alignment="center">
+        <font face="Courier New" size="10"/>
+        <geometryInfo x="8.25037" y="0.00061" width="1.41626" height="0.17090"
+        />
+        <generalLayout horizontalElasticity="variable"/>
+      </field>
+      <field name="F_31" source="P_BRANCH_NAME" minWidowLines="1" spacing="0"
+       alignment="start">
+        <font face="Courier New" size="9"/>
+        <geometryInfo x="1.52014" y="0.50000" width="2.42773" height="0.16663"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+      <field name="F_38" source="P_DEPT" minWidowLines="1" spacing="0"
+       alignment="start">
+        <font face="Courier New" size="9"/>
+        <geometryInfo x="1.52075" y="0.66663" width="2.43762" height="0.16675"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+      <text name="B_38" minWidowLines="1">
+        <textSettings justify="end" spacing="0"/>
+        <geometryInfo x="6.83423" y="0.52075" width="1.41663" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="9"/>
+          <string>
+          <![CDATA[Αριθμός Απόφασης:]]>
+          </string>
+        </textSegment>
+      </text>
+      <text name="B_37" minWidowLines="1">
+        <textSettings justify="center" spacing="0"/>
+        <geometryInfo x="6.91687" y="0.68738" width="1.33337" height="0.16663"
+        />
+        <textSegment>
+          <font face="Courier New" size="10"/>
+          <string>
+          <![CDATA[Ημ/νία Απόφασης:]]>
+          </string>
+        </textSegment>
+      </text>
+      <field name="F_40" source="P_DEC_INCR_SEC_NO" minWidowLines="1"
+       spacing="0" alignment="start">
+        <font face="Courier New" size="10"/>
+        <geometryInfo x="8.33362" y="0.52075" width="0.91663" height="0.16663"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+      <field name="F_39" source="P_COMMIT_DATE" minWidowLines="1" spacing="0"
+       alignment="start">
+        <font face="Courier New" size="10"/>
+        <geometryInfo x="8.33337" y="0.68750" width="0.91675" height="0.16663"
+        />
+        <visualSettings linePattern="solid"/>
+      </field>
+    </margin>
+  </section>
+  </layout>
+  <programUnits>
+    <function name="cf_1formula" returnType="character">
+      <textSource>
+      <![CDATA[function CF_1Formula return VARCHAR2 is
+  V_DISPLAY CHAR(13);
+begin
+  
+IF :branch_domain_type='10' THEN
+	V_DISPLAY:='Περιφερειακού ';
+end if;
+IF :branch_domain_type='11' THEN
+	V_DISPLAY:='Τοπικού ';
+end if;
+
+return v_display;
+
+end;]]>
+      </textSource>
+    </function>
+    <function name="cf_sexformula" returnType="character">
+      <textSource>
+      <![CDATA[function CF_SEXFormula return Char is
+
+V_DISPLAY CHAR(16);
+
+begin
+  
+IF :SEX='Α' THEN
+	V_DISPLAY:='του ασφαλισμένου';
+end if;
+IF :SEX='θ' THEN
+	V_DISPLAY:='της ασφαλισμένης';
+end if;
+
+return v_display;
+end;]]>
+      </textSource>
+    </function>
+    <function name="cf_2formula" returnType="number">
+      <textSource>
+      <![CDATA[function CF_2Formula return Number is
+begin
+	
+	IF NVl(:CS_4,0) = 0 OR NVL(:CS_1,0) = 0 THEN
+	  RETURN(NVL(:P_SALARY,0));
+	ELSE  	
+    RETURN(NVl(:CS_4,0) + NVL(:CS_2,0) + NVL(:CS_1,0));
+	END IF;
+	
+end;]]>
+      </textSource>
+    </function>
+    <function name="f_32formattrigger">
+      <textSource>
+      <![CDATA[function F_32FormatTrigger return boolean is
+begin
+  
+  return (TRUE);
+end;]]>
+      </textSource>
+    </function>
+    <function name="f_10formattrigger">
+      <textSource>
+      <![CDATA[function F_10FormatTrigger return boolean is
+begin
+  
+  return (NVl(:CS_4,0) != 0 AND NVl(:CS_2,0) !=0 AND NVL(:CS_1,0) != 0);
+end;]]>
+      </textSource>
+    </function>
+    <function name="f_12formattrigger">
+      <textSource>
+      <![CDATA[function F_12FormatTrigger return boolean is
+begin
+  
+  return (NVL(:CS_4,0) = 0 AND NVL(:CS_2,0) = 0 AND NVL(:CS_1,0) = 0);
+end;]]>
+      </textSource>
+    </function>
+    <function name="b_39formattrigger">
+      <textSource>
+      <![CDATA[function B_39FormatTrigger return boolean is
+PAGE_NUM  NUMBER;
+begin
+ srw.get_page_num (page_num);
+  if  page_num <> 1 then
+   return(false);
+end if;
+  return (TRUE);
+  
+end;]]>
+      </textSource>
+    </function>
+    <function name="cf_3formula" returnType="number">
+      <textSource>
+      <![CDATA[function CF_3Formula return Number is
+begin
+  RETURN(:CS_5 + :CS_8);
+end;]]>
+      </textSource>
+    </function>
+    <function name="cf_4formula" returnType="number">
+      <textSource>
+      <![CDATA[function CF_4Formula return Number is
+begin
+  RETURN(:CS_6 + :CS_9);
+end;]]>
+      </textSource>
+    </function>
+    <function name="cf_5formula" returnType="number">
+      <textSource>
+      <![CDATA[function CF_5Formula return Number is
+begin
+  RETURN(:CS_7 + :CS_10);
+end;]]>
+      </textSource>
+    </function>
+    <function name="cf_6formula" returnType="number">
+      <textSource>
+      <![CDATA[function CF_6Formula return Number is
+begin
+  RETURN(:CS_12 + :CS_11);
+end;]]>
+      </textSource>
+    </function>
+  </programUnits>
+  <webSource>
+  <![CDATA[<%@ taglib uri="/WEB-INF/lib/reports_tld.jar" prefix="rw" %> 
+<%@ page language="java" import="java.io.*" errorPage="/rwerror.jsp" session="false" %>
+<%@ page contentType="text/html;charset=ISO-8859-1" %>
+<!--
+<rw:report id="report"> 
+<rw:objects id="objects">
+</rw:objects>
+-->
+
+<html>
+
+<head>
+<meta name="GENERATOR" content="Oracle 11gR1 Reports Developer"/>
+<title> Your Title </title>
+
+<rw:style id="yourStyle">
+   <!-- Report Wizard inserts style link clause here -->
+</rw:style>
+
+</head>
+
+
+<body>
+
+<rw:dataArea id="yourDataArea">
+   <!-- Report Wizard inserts the default jsp here -->
+</rw:dataArea>
+
+
+
+</body>
+</html>
+
+<!--
+</rw:report> 
+-->
+]]>
+  </webSource>
+  <reportPrivate defaultReportType="tabular" versionFlags2="0"
+   charPromptMustSplit="92" minFieldResizeRate="20" minFontPoints="8"
+   templateName=""/>
+  <reportWebSettings>
+  <![CDATA[#NULL#]]>
+  </reportWebSettings>
+</report>

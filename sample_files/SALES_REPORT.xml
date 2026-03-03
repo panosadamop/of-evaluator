@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<Report Name="SALES_REPORT">
+  <DataModel>
+    <Query Name="Q_SALES" DatabaseDataBlock="YES"
+           SelectStatement="SELECT S.SALE_ID, S.SALE_DATE, C.CUSTOMER_NAME,
+           P.PRODUCT_NAME, S.QUANTITY, S.UNIT_PRICE,
+           (S.QUANTITY * S.UNIT_PRICE) AS TOTAL_AMOUNT
+           FROM SALES S
+           JOIN CUSTOMERS C ON S.CUSTOMER_ID = C.CUSTOMER_ID
+           JOIN PRODUCTS P ON S.PRODUCT_ID = P.PRODUCT_ID
+           WHERE S.SALE_DATE BETWEEN :P_START_DATE AND :P_END_DATE
+           ORDER BY S.SALE_DATE"/>
+  </DataModel>
+  <Parameters>
+    <Parameter Name="P_START_DATE" DataType="DATE" InitialValue="01-JAN-2024"/>
+    <Parameter Name="P_END_DATE" DataType="DATE" InitialValue="31-DEC-2024"/>
+    <Parameter Name="P_TITLE" DataType="VARCHAR2" InitialValue="Sales Report"/>
+  </Parameters>
+  <BeforeReport>
+    <FunctionBody>
+FUNCTION BeforeReport RETURN BOOLEAN IS
+BEGIN
+  :P_TITLE := 'Sales Report - ' || TO_CHAR(SYSDATE, 'YYYY');
+  RETURN TRUE;
+END;
+    </FunctionBody>
+  </BeforeReport>
+</Report>

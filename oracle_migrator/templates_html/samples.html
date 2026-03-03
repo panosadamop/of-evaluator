@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Sample Files — Oracle Migrator{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="fw-bold mb-0">Sample Files</h5>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Built-in Oracle Forms &amp; Reports</div>
+    <div class="card-body">
+        <p class="text-muted small mb-3">
+            These sample files cover all three complexity levels and are available in the
+            Analyze and Convert screens without needing to upload anything.
+        </p>
+
+        {% if samples %}
+        <table class="table table-sm table-bordered mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>File</th>
+                    <th>Type</th>
+                    <th>Size</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for s in samples %}
+            <tr>
+                <td class="fw-semibold">{{ s.name }}</td>
+                <td><span class="badge bg-secondary">{{ s.type }}</span></td>
+                <td class="text-muted">{{ s.size }} bytes</td>
+                <td>
+                    <a href="/analyze" class="btn btn-outline-primary btn-sm">Analyze</a>
+                    <a href="/convert" class="btn btn-primary btn-sm">Convert</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info small mb-0">
+            Sample files are created on first run via <code>python cli.py demo</code> or when using the Analyze/Convert screens.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Sample File Details</div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="border border-success rounded p-3 h-100">
+                    <span class="badge bg-success mb-2">Level 1 — Simple</span>
+                    <p class="fw-semibold small mb-1">EMPLOYEE_LOOKUP.fmt</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li>2 triggers</li>
+                        <li>WHEN-NEW-FORM-INSTANCE</li>
+                        <li>WHEN-BUTTON-PRESSED</li>
+                        <li>GO_BLOCK navigation</li>
+                        <li>No DML, no cursors</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border border-warning rounded p-3 h-100">
+                    <span class="badge bg-warning text-dark mb-2">Level 2 — Moderate</span>
+                    <p class="fw-semibold small mb-1">ORDER_ENTRY.fmt</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li>4 triggers</li>
+                        <li>WHEN-VALIDATE-RECORD</li>
+                        <li>PRE-INSERT with sequence</li>
+                        <li>POST-COMMIT with DML</li>
+                        <li>Exception handling block</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border border-danger rounded p-3 h-100">
+                    <span class="badge bg-danger mb-2">Level 3 — Complex</span>
+                    <p class="fw-semibold small mb-1">PAYROLL_PROCESSING.fmt</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li>4 high-weight triggers</li>
+                        <li>ON-INSERT, ON-UPDATE</li>
+                        <li>Explicit cursors + loops</li>
+                        <li>EXECUTE IMMEDIATE</li>
+                        <li>Multiple exception blocks</li>
+                        <li>PRE-COMMIT with GO_BLOCK</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <div class="border rounded p-3">
+                    <span class="badge bg-secondary mb-2">Oracle Report</span>
+                    <p class="fw-semibold small mb-1">SALES_REPORT.xml</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li>1 query with JOINs across 3 tables</li>
+                        <li>3 parameters (dates + title)</li>
+                        <li>BEFORE-REPORT formula trigger</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="border rounded p-3">
+                    <span class="badge bg-secondary mb-2">Oracle Report</span>
+                    <p class="fw-semibold small mb-1">MONTHLY_REPORT.xml</p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li>2 queries (detail + totals)</li>
+                        <li>BEFORE-REPORT + AFTER-REPORT (DML)</li>
+                        <li>1 date parameter</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

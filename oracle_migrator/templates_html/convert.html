@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Convert — {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="fw-bold mb-0">Convert Oracle Files</h5>
+</div>
+
+{% if not zip_ready %}
+<div class="card mb-4">
+    <div class="card-header">Upload &amp; Configure</div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" id="convertForm">
+
+            <div class="upload-zone mb-2" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <div class="fs-2 mb-2">&#9881;</div>
+                <div class="fw-semibold">Click to select files or drag &amp; drop</div>
+                <div class="text-muted small mt-1">
+                    Individual files: <code>.fmt</code> &nbsp;<code>.fmb</code> &nbsp;<code>.xml</code> &nbsp;<code>.rdf</code> &nbsp;<code>.rpt</code>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <strong>ZIP archive</strong> of an entire folder (extracted automatically)
+                </div>
+                <div id="fileList" class="mt-2 small text-primary fw-semibold"></div>
+            </div>
+            <p class="text-muted small mb-3">
+                No file size limit. Upload a ZIP of your entire Oracle Forms project folder — all supported files inside are extracted and converted.
+            </p>
+            <input type="file" id="fileInput" name="files" multiple
+                   accept=".fmt,.xml,.rdf,.fmb,.rpt,.txt,.zip" class="d-none"/>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small">Or use built-in sample files:</label>
+                <div class="row g-2">
+                    {% for s in samples %}
+                    <div class="col-md-4 col-sm-6">
+                        <label class="sample-check-item w-100">
+                            <input type="checkbox" name="samples" value="{{ s }}"/>
+                            {{ s }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small">Conversion target:</label>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="sample-check-item w-100">
+                            <input type="radio" name="target" value="java"/>
+                            <div>
+                                <div class="fw-semibold">Jakarta EE 10</div>
+                                <div class="text-muted" style="font-size:0.78rem;">JPA · CDI · EJB · JAX-RS · JSF</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="sample-check-item w-100">
+                            <input type="radio" name="target" value="jasper"/>
+                            <div>
+                                <div class="fw-semibold">JasperReports</div>
+                                <div class="text-muted" style="font-size:0.78rem;">JRXML with all bands + Java runner</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="sample-check-item w-100" style="border-color:#0d6efd; background:#f0f6ff;">
+                            <input type="radio" name="target" value="both" checked/>
+                            <div>
+                                <div class="fw-semibold">Both targets</div>
+                                <div class="text-muted" style="font-size:0.78rem;">Recommended — generates all outputs</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 align-items-center">
+                <button type="submit" class="btn btn-primary btn-sm">Convert &amp; Generate ZIP</button>
+                <span class="text-muted small">You'll download a ZIP ready to unzip and run.</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-success">Conversion complete. Your files are ready to download.</div>
+
+<div class="card mb-4">
+    <div class="card-header">Download</div>
+    <div class="card-body text-center py-4">
+        <a href="/download/{{ run_id }}" class="btn btn-success">Download ZIP</a>
+        <p class="text-muted small mt-2 mb-0">Contains all generated files organized by artifact name.</p>
+    </div>
+</div>
+
+<h6 class="fw-bold mb-3">Converted artifacts</h6>
+<table class="table table-sm table-bordered bg-white">
+    <thead class="table-light">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Complexity</th>
+            <th>Files generated</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for c in converted %}
+    <tr>
+        <td class="fw-semibold">{{ c.name }}</td>
+        <td><span class="badge bg-secondary">{{ c.type }}</span></td>
+        <td>
+            {% if c.complexity_score == 1 %}
+            <span class="badge bg-success">{{ c.complexity }}</span>
+            {% elif c.complexity_score == 2 %}
+            <span class="badge bg-info text-dark">{{ c.complexity }}</span>
+            {% elif c.complexity_score == 3 %}
+            <span class="badge bg-warning text-dark">{{ c.complexity }}</span>
+            {% elif c.complexity_score == 4 %}
+            <span class="badge bg-danger">{{ c.complexity }}</span>
+            {% else %}
+            <span class="badge text-white" style="background:#212529;">{{ c.complexity }}</span>
+            {% endif %}
+        </td>
+        <td>{{ c.files_count }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="card mb-4">
+    <div class="card-header">How to run the generated code</div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <p class="fw-semibold small mb-1">Jakarta EE 10 (WildFly / Payara)</p>
+<pre class="mb-0">cd &lt;artifact&gt;/jee/
+
+# Build the WAR
+mvn clean package
+
+# Deploy to WildFly
+cp target/*.war $WILDFLY_HOME/standalone/deployments/
+
+# Or use embedded Arquillian for tests
+mvn test</pre>
+            </div>
+            <div class="col-md-6">
+                <p class="fw-semibold small mb-1">JasperReports</p>
+<pre class="mb-0">cd &lt;artifact&gt;/jasper/
+mvn jasperreports:compile-reports
+
+export DB_URL=jdbc:oracle:thin:@...
+export DB_USER=user
+export DB_PASS=pass
+
+java -cp "target/*" &lt;Name&gt;Runner out.pdf</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex gap-2">
+    <a href="/convert" class="btn btn-primary btn-sm">Convert More Files</a>
+    <a href="/analyze" class="btn btn-outline-secondary btn-sm">Analyze More Files</a>
+</div>
+{% endif %}
+
+{% if errors %}
+<div class="card border-danger mt-3">
+    <div class="card-header text-danger">Errors</div>
+    <div class="card-body">
+        {% for e in errors %}
+        <div class="alert alert-danger py-2 mb-2 small">{{ e }}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const zone  = document.getElementById('dropZone');
+const input = document.getElementById('fileInput');
+const list  = document.getElementById('fileList');
+if (input) {
+    input.addEventListener('change', updateList);
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        input.files = e.dataTransfer.files;
+        updateList();
+    });
+}
+function updateList() {
+    if (!list || !input) return;
+    const files = Array.from(input.files);
+    if (!files.length) { list.textContent = ''; return; }
+    const totalMB = (files.reduce((s, f) => s + f.size, 0) / (1024 * 1024)).toFixed(1);
+    list.textContent = files.map(f => f.name).join(', ')
+        + ` — ${files.length} file${files.length > 1 ? 's' : ''}, ${totalMB} MB`;
+}
+</script>
+{% endblock %}
