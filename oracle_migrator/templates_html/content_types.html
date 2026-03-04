@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+{% block title %}Content Types — {{ app_name }}{% endblock %}
+
+{% block head %}
+<style>
+/* ── FIELD TABLE ───────────────────────────────────────────────── */
+.field-table{width:100%;border-collapse:collapse;}
+.field-table th{
+  background:var(--surface-2);color:var(--text-2);
+  font-size:.69rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+  padding:.55rem .75rem;border:1px solid var(--border);
+}
+.field-table td{padding:.55rem .75rem;border:1px solid var(--border);font-size:.82rem;vertical-align:middle;}
+.field-table tbody tr{background:var(--surface);transition:background .12s;}
+.field-table tbody tr:hover{background:var(--surface-2);}
+.field-table code{font-size:.77em;}
+.req-yes{color:#22c55e;font-weight:700;}
+.req-no{color:var(--text-3);}
+.field-note{font-size:.78rem;color:var(--text-2);line-height:1.5;}
+
+/* ── META INFO BOX ─────────────────────────────────────────────── */
+.meta-box{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:.85rem 1rem;
+}
+.meta-row{display:flex;align-items:baseline;justify-content:space-between;font-size:.8rem;padding:.2rem 0;}
+.meta-row:not(:last-child){border-bottom:1px solid var(--border);}
+.meta-key{color:var(--text-2);font-weight:500;}
+.meta-val{font-family:'JetBrains Mono',monospace;font-size:.77rem;}
+
+/* ── CT TYPE ICON ──────────────────────────────────────────────── */
+.ct-type-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  background:var(--glow);border:1px solid rgba(79,110,247,.2);flex-shrink:0;
+}
+
+/* ── DISPLAY ROW ───────────────────────────────────────────────── */
+.display-strip{
+  display:flex;gap:2rem;flex-wrap:wrap;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:.85rem 1rem;margin-top:1.2rem;
+  font-size:.8rem;
+}
+.display-item .di-label{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);font-family:'JetBrains Mono',monospace;margin-bottom:.2rem;}
+.display-item .di-val{color:var(--text-2);}
+
+/* ── COMPARE TABLE ─────────────────────────────────────────────── */
+.cmp-yes{color:#22c55e;font-weight:600;}
+.cmp-no{color:var(--text-3);}
+.cmp-diff{color:var(--accent);font-weight:600;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-hd fade-up fade-up-1">
+  <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+    <div>
+      <div class="page-eyebrow">oracle-migrator</div>
+      <h2 class="page-title" data-i18n="ct.heading">Content Types</h2>
+      <p class="page-sub" data-i18n="ct.subheading">Structured content definitions — modelled after Drupal core content types</p>
+    </div>
+    <span class="level-chip level-2" style="margin-top:.5rem;align-self:flex-start;">2 types</span>
+  </div>
+</div>
+
+<!-- TABS -->
+<ul class="nav nav-tabs mb-0 fade-up fade-up-2" id="ctTabs">
+  <li class="nav-item">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-article" type="button">
+      📰 <span data-i18n="ct.article.tab">Article</span>
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-page" type="button">
+      📄 <span data-i18n="ct.page.tab">Basic Page</span>
+    </button>
+  </li>
+  <li class="nav-item ms-auto">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-compare" type="button">
+      ⚖ <span data-i18n="ct.compare.tab">Compare</span>
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content fade-up fade-up-3">
+
+  <!-- ── ARTICLE ──────────────────────────────────────────────── -->
+  <div class="tab-pane fade show active" id="tab-article">
+    <div class="card">
+      <div class="card-body">
+        <div class="row g-4 mb-4">
+          <div class="col-lg-8">
+            <div class="d-flex align-items-start gap-3">
+              <div class="ct-type-icon">📰</div>
+              <div>
+                <h5 class="fw-bold mb-1" style="font-family:'Bricolage Grotesque',sans-serif;" data-i18n="ct.article.name">Article</h5>
+                <p class="text-muted mb-0" style="font-size:.83rem;" data-i18n="ct.article.desc">
+                  Time-sensitive, authored content — news items, blog posts, press releases.
+                  Carries a publication date, author byline, taxonomy tags, and a hero image.
+                  Promoted to the front page by default and supports reader comments.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="meta-box">
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.machine">Machine name</span><code>article</code></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.base">Base</span><code>node</code></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.revisions">Revisions</span><span class="meta-val" style="color:#22c55e;" data-i18n="ct.meta.enabled">Enabled</span></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.comments">Comments</span><span class="meta-val" data-i18n="ct.meta.openDefault">Open (default)</span></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.promoted">Promoted</span><span class="meta-val" style="color:#22c55e;" data-i18n="ct.meta.yes">Yes</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="field-table">
+            <thead>
+              <tr>
+                <th style="min-width:140px" data-i18n="ct.col.field">Field label</th>
+                <th style="min-width:135px" data-i18n="ct.col.machine">Machine name</th>
+                <th style="min-width:185px" data-i18n="ct.col.type">Field type</th>
+                <th class="text-center" style="width:74px" data-i18n="ct.col.required">Required</th>
+                <th class="text-center" style="width:80px" data-i18n="ct.col.cardinality">Cardinality</th>
+                <th data-i18n="ct.col.notes">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="fw-semibold" data-i18n="ct.f.title">Title</td><td><code>title</code></td><td><span class="tag">String (255)</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.title">Page &lt;h1&gt;, browser &lt;title&gt;, breadcrumb label, Pathauto token source.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.body">Body</td><td><code>body</code></td><td><span class="tag">Text (formatted long + summary)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.body.article">Full HTML body with independent summary for teasers and RSS. WYSIWYG (CKEditor 5) enabled.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.image">Image</td><td><code>field_image</code></td><td><span class="tag">Image (file entity)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.image">Stores file ID, alt text, title attribute. Rendered in header and teaser with configurable image styles.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.tags">Tags</td><td><code>field_tags</code></td><td><span class="tag">Entity reference → Taxonomy</span></td><td class="text-center req-no">—</td><td class="text-center">∞</td><td class="field-note" data-i18n="ct.fn.tags">References <em>Tags</em> vocabulary. Auto-creates new terms. Unlimited values, displayed as comma-separated links.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.author">Author</td><td><code>uid</code></td><td><span class="tag">Entity reference → User</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.author">Drupal user who authored. Shown in byline as "Submitted by …". Admins can reassign.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.status">Published</td><td><code>status</code></td><td><span class="tag">Boolean</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.status">Controls visibility to anonymous users. Unpublished = only users with <em>View own unpublished</em>.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.promote">Promoted to front page</td><td><code>promote</code></td><td><span class="tag">Boolean</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.promote.article">Checked by default. Includes in front-page listing view. Can be unchecked per article.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.sticky">Sticky at top</td><td><code>sticky</code></td><td><span class="tag">Boolean</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.sticky">Pins node to top of listing views regardless of publication date. Unchecked by default.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.created">Created</td><td><code>created</code></td><td><span class="tag">Timestamp (Unix)</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.created">Set on first save; editable by admins. Displayed as "Authored on". Used for date-sorted listings.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.changed">Changed</td><td><code>changed</code></td><td><span class="tag">Timestamp (Unix)</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.changed">Auto-updated on every save. Used for cache invalidation and "Last updated" display.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.langcode">Language</td><td><code>langcode</code></td><td><span class="tag">Language selector</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.langcode">BCP-47 code (e.g. <code>en</code>, <code>el</code>, <code>de</code>). Enables Content Translation; each language = own revision.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.path">URL alias</td><td><code>path</code></td><td><span class="tag">Path alias</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.path.article">Pathauto pattern <code>/article/[node:title]</code>. One alias per language translation.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.revision_log">Revision log</td><td><code>revision_log</code></td><td><span class="tag">Text (plain, long)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.revision_log">Editor note per revision; shown in revision history tab.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.meta_desc">Meta description</td><td><code>field_meta_description</code></td><td><span class="tag">String (320)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.meta_desc.article">Rendered as <code>&lt;meta name="description"&gt;</code>. Falls back to body summary when empty.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.comment">Comment settings</td><td><code>comment</code></td><td><span class="tag">Integer enum</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.comment.article">0=Hidden · 1=Closed · 2=Open. Defaults to <strong>Open</strong> for articles.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="display-strip">
+          <div class="display-item"><div class="di-label" data-i18n="ct.display.teaser">Teaser</div><div class="di-val" data-i18n="ct.dv.article.teaser">Title · Image thumbnail · Body summary · Tags · Authored date</div></div>
+          <div class="display-item"><div class="di-label" data-i18n="ct.display.full">Full</div><div class="di-val" data-i18n="ct.dv.article.full">All fields · Comments section · Related articles (Views)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BASIC PAGE ────────────────────────────────────────────── -->
+  <div class="tab-pane fade" id="tab-page">
+    <div class="card">
+      <div class="card-body">
+        <div class="row g-4 mb-4">
+          <div class="col-lg-8">
+            <div class="d-flex align-items-start gap-3">
+              <div class="ct-type-icon" style="background:rgba(148,163,184,.12);border-color:rgba(148,163,184,.2);">📄</div>
+              <div>
+                <h5 class="fw-bold mb-1" style="font-family:'Bricolage Grotesque',sans-serif;" data-i18n="ct.page.name">Basic Page</h5>
+                <p class="text-muted mb-0" style="font-size:.83rem;" data-i18n="ct.page.desc">
+                  Static, evergreen content — About pages, Contact pages, Privacy Policies.
+                  Not promoted to the front page; no tags or image field.
+                  Typically linked from the main navigation menu.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="meta-box">
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.machine">Machine name</span><code>page</code></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.base">Base</span><code>node</code></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.revisions">Revisions</span><span class="meta-val" style="color:#22c55e;" data-i18n="ct.meta.enabled">Enabled</span></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.comments">Comments</span><span class="meta-val" data-i18n="ct.meta.closedDefault">Closed (default)</span></div>
+              <div class="meta-row"><span class="meta-key" data-i18n="ct.meta.promoted">Promoted</span><span class="meta-val" data-i18n="ct.meta.no">No</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="field-table">
+            <thead>
+              <tr>
+                <th style="min-width:140px" data-i18n="ct.col.field">Field label</th>
+                <th style="min-width:135px" data-i18n="ct.col.machine">Machine name</th>
+                <th style="min-width:185px" data-i18n="ct.col.type">Field type</th>
+                <th class="text-center" style="width:74px" data-i18n="ct.col.required">Required</th>
+                <th class="text-center" style="width:80px" data-i18n="ct.col.cardinality">Cardinality</th>
+                <th data-i18n="ct.col.notes">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="fw-semibold" data-i18n="ct.f.title">Title</td><td><code>title</code></td><td><span class="tag">String (255)</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.title">Page &lt;h1&gt;, browser &lt;title&gt;, breadcrumb label, Pathauto token source.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.body">Body</td><td><code>body</code></td><td><span class="tag">Text (formatted long)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.body.page">Full HTML body, no summary sub-field. WYSIWYG (CKEditor 5).</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.author">Author</td><td><code>uid</code></td><td><span class="tag">Entity reference → User</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.author.page">Authoring user. Not displayed in default template; available to Views, tokens, themes.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.status">Published</td><td><code>status</code></td><td><span class="tag">Boolean</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.status">Controls visibility to anonymous users. Unpublished = only users with <em>View own unpublished</em>.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.promote">Promoted</td><td><code>promote</code></td><td><span class="tag">Boolean</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.promote.page">Unchecked by default. Enabling adds page to front-page listing views.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.menu_link">Menu link</td><td><code>menu_link</code></td><td><span class="tag">Menu link (composite)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.menu_link">Adds page to a menu with configurable title, parent item, description, and weight.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.created">Created</td><td><code>created</code></td><td><span class="tag">Timestamp (Unix)</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.created">Set on first save; editable by admins. Not shown in default display.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.changed">Changed</td><td><code>changed</code></td><td><span class="tag">Timestamp (Unix)</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.changed">Auto-updated on every save. Used for cache invalidation and "Last updated" display.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.langcode">Language</td><td><code>langcode</code></td><td><span class="tag">Language selector</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.langcode">BCP-47 code. Enables Content Translation; each language = own revision.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.path">URL alias</td><td><code>path</code></td><td><span class="tag">Path alias</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.path.page">Pathauto pattern <code>/[node:title]</code>. Override for top-level paths like <code>/about</code>.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.revision_log">Revision log</td><td><code>revision_log</code></td><td><span class="tag">Text (plain, long)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.revision_log">Editor note per revision; shown in revision history tab.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.meta_desc">Meta description</td><td><code>field_meta_description</code></td><td><span class="tag">String (320)</span></td><td class="text-center req-no">—</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.meta_desc.page">Critical for pages without body summary. Rendered as <code>&lt;meta name="description"&gt;</code>.</td></tr>
+              <tr><td class="fw-semibold" data-i18n="ct.f.comment">Comment settings</td><td><code>comment</code></td><td><span class="tag">Integer enum</span></td><td class="text-center req-yes">✓</td><td class="text-center">1</td><td class="field-note" data-i18n="ct.fn.comment.page">0=Hidden · 1=Closed · 2=Open. Defaults to <strong>Closed</strong> for pages.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="display-strip">
+          <div class="display-item"><div class="di-label" data-i18n="ct.display.full">Full</div><div class="di-val" data-i18n="ct.dv.page.full">Title · Body only. No byline, no tags, no image.</div></div>
+          <div class="display-item"><div class="di-label" data-i18n="ct.display.teaser">Teaser</div><div class="di-val" data-i18n="ct.dv.page.teaser">Not used in default listings.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── COMPARE ───────────────────────────────────────────────── -->
+  <div class="tab-pane fade" id="tab-compare">
+    <div class="card">
+      <div class="card-body">
+        <p class="text-muted mb-4" style="font-size:.83rem;" data-i18n="ct.compare.desc">Side-by-side field availability comparison of Article vs Basic Page.</p>
+        <div class="table-responsive">
+          <table class="field-table">
+            <thead>
+              <tr>
+                <th style="min-width:180px">Field</th>
+                <th class="text-center" style="width:100px">📰 Article</th>
+                <th class="text-center" style="width:110px">📄 Basic Page</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>title</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">Both required.</td></tr>
+              <tr><td><code>body</code></td><td class="text-center cmp-diff">✓ + summary</td><td class="text-center cmp-yes">✓</td><td class="field-note">Article has independent teaser summary field; Page does not.</td></tr>
+              <tr><td><code>field_image</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-no">—</td><td class="field-note">Hero/thumbnail image only on Article.</td></tr>
+              <tr><td><code>field_tags</code></td><td class="text-center cmp-yes">✓ (∞)</td><td class="text-center cmp-no">—</td><td class="field-note">Taxonomy tagging only on Article.</td></tr>
+              <tr><td><code>menu_link</code></td><td class="text-center cmp-no">—</td><td class="text-center cmp-yes">✓</td><td class="field-note">Navigation menu integration only on Basic Page.</td></tr>
+              <tr><td><code>uid</code> (author)</td><td class="text-center cmp-diff">✓ shown</td><td class="text-center cmp-yes">✓ hidden</td><td class="field-note">Both track authorship; Article surfaces it in the byline.</td></tr>
+              <tr><td><code>promote</code></td><td class="text-center cmp-diff">On (default)</td><td class="text-center cmp-no">Off (default)</td><td class="field-note">Articles on front page by default; Pages are not.</td></tr>
+              <tr><td><code>comment</code></td><td class="text-center cmp-diff">Open</td><td class="text-center cmp-no">Closed</td><td class="field-note">Different defaults; both support 0/1/2 per node.</td></tr>
+              <tr><td><code>status</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">Published flag on both.</td></tr>
+              <tr><td><code>sticky</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">Sticky-at-top on both.</td></tr>
+              <tr><td><code>created</code> / <code>changed</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">Timestamps on both; Article surfaces <em>created</em> in byline.</td></tr>
+              <tr><td><code>langcode</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">Full multilingual support on both.</td></tr>
+              <tr><td><code>path</code></td><td class="text-center cmp-diff"><code>/article/…</code></td><td class="text-center cmp-diff"><code>/…</code></td><td class="field-note">Different Pathauto patterns; Page supports top-level paths.</td></tr>
+              <tr><td><code>revision_log</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">Revision history on both.</td></tr>
+              <tr><td><code>field_meta_description</code></td><td class="text-center cmp-yes">✓</td><td class="text-center cmp-yes">✓</td><td class="field-note">SEO meta description on both.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:1.5rem;font-size:.78rem;flex-wrap:wrap;">
+          <span><span class="cmp-yes fw-semibold">✓ green</span> = present on both</span>
+          <span><span class="cmp-diff fw-semibold">blue</span> = present but differs between types</span>
+          <span><span class="cmp-no fw-semibold">—</span> = not present</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+/* Extend i18n with Content Type strings */
+const CT_STRINGS = {
+  en:{
+    "ct.heading":"Content Types","ct.subheading":"Structured content definitions — modelled after Drupal core content types",
+    "ct.article.tab":"Article","ct.page.tab":"Basic Page","ct.compare.tab":"Compare",
+    "ct.article.name":"Article","ct.page.name":"Basic Page",
+    "ct.article.desc":"Time-sensitive, authored content — news items, blog posts, press releases. Carries a publication date, author byline, taxonomy tags, and a hero image. Promoted to front page by default, supports comments.",
+    "ct.page.desc":"Static, evergreen content — About pages, Contact pages, Privacy Policies. Not promoted to front page; no tags or image field. Typically linked from the main navigation menu.",
+    "ct.compare.desc":"Side-by-side field availability comparison of Article vs Basic Page.",
+    "ct.meta.machine":"Machine name","ct.meta.base":"Base","ct.meta.revisions":"Revisions",
+    "ct.meta.enabled":"Enabled","ct.meta.comments":"Comments",
+    "ct.meta.openDefault":"Open (default)","ct.meta.closedDefault":"Closed (default)",
+    "ct.meta.promoted":"Promoted","ct.meta.yes":"Yes","ct.meta.no":"No",
+    "ct.col.field":"Field label","ct.col.machine":"Machine name","ct.col.type":"Field type",
+    "ct.col.required":"Required","ct.col.cardinality":"Cardinality","ct.col.notes":"Notes",
+    "ct.f.title":"Title","ct.f.body":"Body","ct.f.image":"Image","ct.f.tags":"Tags",
+    "ct.f.author":"Author","ct.f.status":"Published","ct.f.promote":"Promoted to front page",
+    "ct.f.sticky":"Sticky at top","ct.f.created":"Created","ct.f.changed":"Changed",
+    "ct.f.langcode":"Language","ct.f.path":"URL alias","ct.f.menu_link":"Menu link",
+    "ct.f.revision_log":"Revision log","ct.f.meta_desc":"Meta description","ct.f.comment":"Comment settings",
+    "ct.fn.title":"Page <h1>, browser <title>, breadcrumb label, Pathauto token source.",
+    "ct.fn.body.article":"Full HTML body with independent summary for teasers and RSS. WYSIWYG (CKEditor 5) enabled.",
+    "ct.fn.body.page":"Full HTML body, no summary sub-field. WYSIWYG (CKEditor 5).",
+    "ct.fn.image":"Stores file ID, alt text, title attribute. Rendered in header and teaser with configurable image styles.",
+    "ct.fn.tags":"References Tags vocabulary. Auto-creates new terms. Unlimited values, comma-separated links.",
+    "ct.fn.author":"Drupal user who authored. Shown in byline as "Submitted by …". Admins can reassign.",
+    "ct.fn.author.page":"Authoring user. Not displayed in default template; available to Views, tokens, themes.",
+    "ct.fn.status":"Controls visibility to anonymous users. Unpublished = only users with View own unpublished.",
+    "ct.fn.promote.article":"Checked by default. Includes in front-page listing view. Can be unchecked per article.",
+    "ct.fn.promote.page":"Unchecked by default. Enabling adds page to front-page listing views.",
+    "ct.fn.sticky":"Pins node to top of listing views regardless of publication date.",
+    "ct.fn.created":"Set on first save; editable by admins. Displayed as "Authored on".",
+    "ct.fn.changed":"Auto-updated on every save. Used for cache invalidation and "Last updated" display.",
+    "ct.fn.langcode":"BCP-47 code (e.g. en, el, de). Enables Content Translation; each language = own revision.",
+    "ct.fn.path.article":"Pathauto pattern /article/[node:title]. One alias per language translation.",
+    "ct.fn.path.page":"Pathauto pattern /[node:title]. Override for top-level paths like /about.",
+    "ct.fn.menu_link":"Adds page to a menu with configurable title, parent item, description, and weight.",
+    "ct.fn.revision_log":"Editor note per revision; shown in revision history tab.",
+    "ct.fn.meta_desc.article":"Rendered as <meta name=\"description\">. Falls back to body summary when empty.",
+    "ct.fn.meta_desc.page":"Critical for pages without body summary. Rendered as <meta name=\"description\">.",
+    "ct.fn.comment.article":"0=Hidden · 1=Closed · 2=Open. Defaults to Open for articles.",
+    "ct.fn.comment.page":"0=Hidden · 1=Closed · 2=Open. Defaults to Closed for pages.",
+    "ct.display.teaser":"Teaser","ct.display.full":"Full display",
+    "ct.dv.article.teaser":"Title · Image thumbnail · Body summary · Tags · Authored date",
+    "ct.dv.article.full":"All fields · Comments section · Related articles (Views)",
+    "ct.dv.page.full":"Title · Body only. No byline, no tags, no image.",
+    "ct.dv.page.teaser":"Not used in default listings.",
+  },
+  el:{
+    "ct.heading":"Τύποι Περιεχομένου","ct.subheading":"Ορισμοί δομημένου περιεχομένου — βασισμένοι στους τύπους πυρήνα Drupal",
+    "ct.article.tab":"Άρθρο","ct.page.tab":"Βασική Σελίδα","ct.compare.tab":"Σύγκριση",
+    "ct.article.name":"Άρθρο","ct.page.name":"Βασική Σελίδα",
+    "ct.article.desc":"Χρονικά ευαίσθητο περιεχόμενο — νέα, αναρτήσεις, δελτία τύπου. Φέρει ετικέτες, εικόνα και προωθείται στην αρχική.",
+    "ct.page.desc":"Στατικό περιεχόμενο — Σχετικά, Επικοινωνία, Απόρρητο. Δεν προωθείται στην αρχική, δεν έχει ετικέτες ή εικόνα.",
+    "ct.compare.desc":"Σύγκριση πεδίων Άρθρου και Βασικής Σελίδας.",
+    "ct.meta.machine":"Μηχ. όνομα","ct.meta.base":"Βάση","ct.meta.revisions":"Αναθεωρήσεις",
+    "ct.meta.enabled":"Ενεργό","ct.meta.comments":"Σχόλια",
+    "ct.meta.openDefault":"Ανοιχτά (προεπ.)","ct.meta.closedDefault":"Κλειστά (προεπ.)",
+    "ct.meta.promoted":"Προώθηση","ct.meta.yes":"Ναι","ct.meta.no":"Όχι",
+    "ct.col.field":"Ετικέτα","ct.col.machine":"Μηχ. όνομα","ct.col.type":"Τύπος",
+    "ct.col.required":"Υποχ.","ct.col.cardinality":"Πολλαπλ.","ct.col.notes":"Σημειώσεις",
+    "ct.f.title":"Τίτλος","ct.f.body":"Σώμα","ct.f.image":"Εικόνα","ct.f.tags":"Ετικέτες",
+    "ct.f.author":"Συγγρ.","ct.f.status":"Δημοσιευμένο","ct.f.promote":"Προώθηση αρχικής",
+    "ct.f.sticky":"Καρφωμένο","ct.f.created":"Δημιουργία","ct.f.changed":"Τροποποίηση",
+    "ct.f.langcode":"Γλώσσα","ct.f.path":"Ψευδώνυμο URL","ct.f.menu_link":"Σύνδεσμος μενού",
+    "ct.f.revision_log":"Αρχείο αναθ.","ct.f.meta_desc":"Μετα-περιγραφή","ct.f.comment":"Ρυθμ. σχολίων",
+    "ct.display.teaser":"Teaser","ct.display.full":"Πλήρης",
+  },
+  de:{
+    "ct.heading":"Inhaltstypen","ct.subheading":"Strukturierte Inhaltsdefinitionen — nach Drupal-Core modelliert",
+    "ct.article.tab":"Artikel","ct.page.tab":"Einfache Seite","ct.compare.tab":"Vergleich",
+    "ct.article.name":"Artikel","ct.page.name":"Einfache Seite",
+    "ct.article.desc":"Zeitkritische Inhalte — Nachrichten, Blogposts, Pressemitteilungen. Mit Tags, Bild und Startseiten-Förderung.",
+    "ct.page.desc":"Statische Inhalte — Über-uns, Kontakt, Datenschutz. Nicht auf Startseite beworben, keine Tags oder Bild.",
+    "ct.compare.desc":"Feldvergleich zwischen Artikel und Einfacher Seite.",
+    "ct.meta.machine":"Maschinenname","ct.meta.base":"Basis","ct.meta.revisions":"Revisionen",
+    "ct.meta.enabled":"Aktiv","ct.meta.comments":"Kommentare",
+    "ct.meta.openDefault":"Offen (Standard)","ct.meta.closedDefault":"Geschlossen (Standard)",
+    "ct.meta.promoted":"Beworben","ct.meta.yes":"Ja","ct.meta.no":"Nein",
+    "ct.col.field":"Feldbezeichnung","ct.col.machine":"Maschinenname","ct.col.type":"Feldtyp",
+    "ct.col.required":"Pflicht","ct.col.cardinality":"Kardinalität","ct.col.notes":"Hinweise",
+    "ct.f.title":"Titel","ct.f.body":"Inhalt","ct.f.image":"Bild","ct.f.tags":"Tags",
+    "ct.f.author":"Autor","ct.f.status":"Veröffentlicht","ct.f.promote":"Startseite",
+    "ct.f.sticky":"Anheften","ct.f.created":"Erstellt","ct.f.changed":"Geändert",
+    "ct.f.langcode":"Sprache","ct.f.path":"URL-Alias","ct.f.menu_link":"Menüeintrag",
+    "ct.f.revision_log":"Revisionsprotokoll","ct.f.meta_desc":"Meta-Beschreibung","ct.f.comment":"Kommentareinstellungen",
+    "ct.display.teaser":"Teaser","ct.display.full":"Vollansicht",
+  }
+};
+
+function applyCT(lang) {
+  const s = CT_STRINGS[lang] || CT_STRINGS.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (s[k] !== undefined) el.textContent = s[k];
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => applyCT(localStorage.getItem('acms-lang') || 'en'));
+
+/* Patch setLang to include CT strings */
+const _baseSetLang = window.setLang;
+window.setLang = function(l) { _baseSetLang(l); applyCT(l); };
+</script>
+{% endblock %}

@@ -1,253 +1,252 @@
 {% extends "base.html" %}
 {% block title %}Analyze — {{ app_name }}{% endblock %}
 
+{% block head %}
+<style>
+.file-preview{margin-top:.65rem;font-size:.78rem;color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:500;}
+.stats-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;margin-bottom:1.5rem;}
+@media(max-width:768px){.stats-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:480px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.results-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+.results-hd-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-.03em;}
+/* Result card */
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1rem;}
+.result-card-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.7rem 1.1rem;background:var(--surface-2);border-bottom:1px solid var(--border);
+  flex-wrap:wrap;gap:.5rem;
+}
+.result-fname{font-family:'JetBrains Mono',monospace;font-weight:500;font-size:.86rem;}
+.result-score-g{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;}
+.result-meta{font-size:.73rem;font-family:'JetBrains Mono',monospace;color:var(--text-3);}
+.result-body{padding:1rem 1.1rem;}
+.result-footer{padding:.38rem 1.1rem;background:var(--surface-2);border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.71rem;color:var(--text-3);}
+/* Metrics */
+.metrics-list{display:flex;flex-direction:column;gap:.35rem;}
+.metric-row{display:flex;align-items:center;gap:.5rem;font-size:.79rem;}
+.metric-key{color:var(--text-2);min-width:150px;flex-shrink:0;}
+.metric-val{font-family:'JetBrains Mono',monospace;font-weight:600;min-width:22px;text-align:right;flex-shrink:0;}
+/* Factor badges */
+.fbadge{display:inline-block;padding:.1rem .34rem;border-radius:4px;font-size:.69rem;font-family:'JetBrains Mono',monospace;font-weight:500;margin:.1rem .1rem 0 0;}
+.fb-dml{background:rgba(249,115,22,.14);color:#f97316;border:1px solid rgba(249,115,22,.28);}
+.fb-dyn{background:rgba(239,68,68,.14);color:#ef4444;border:1px solid rgba(239,68,68,.28);}
+.fb-mod{background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.24);}
+.fb-inf{background:rgba(6,182,212,.12);color:#06b6d4;border:1px solid rgba(6,182,212,.24);}
+.fb-nav{background:var(--surface-2);color:var(--text-3);border:1px solid var(--border);}
+/* Reason / notes */
+.reason-list,.notes-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.35rem;}
+.reason-list li,.notes-list li{font-size:.81rem;color:var(--text-2);padding-left:1.1rem;position:relative;line-height:1.5;}
+.reason-list li::before{content:'·';position:absolute;left:0;color:var(--text-3);}
+.notes-list li::before{content:'→';position:absolute;left:0;color:var(--accent);}
+.trigger-wrap{overflow-x:auto;}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="fw-bold mb-0">Complexity Analyzer</h5>
+<div class="page-hd fade-up fade-up-1">
+  <div class="page-eyebrow">Oracle Migration Tool</div>
+  <h2 class="page-title">Complexity Analyzer</h2>
+  <p class="page-sub">Upload Oracle Forms or Reports to get instant complexity scores, trigger breakdowns &amp; effort estimates.</p>
 </div>
 
-<div class="card mb-4">
-    <div class="card-header">Upload Oracle Files</div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data" id="analyzeForm">
+<!-- UPLOAD -->
+<div class="card mb-4 fade-up fade-up-2">
+  <div class="card-header">Upload Files</div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" id="analyzeForm">
+      <div class="upload-zone mb-3" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📂</div>
+        <div class="upload-title">Drop files here or click to browse</div>
+        <div class="upload-sub">
+          <code>.fmt</code> &nbsp;<code>.xml</code> &nbsp;<code>.rdf</code> &nbsp;<code>.rpt</code> &nbsp;<code>.zip</code>
+          &nbsp;—&nbsp; Individual files or a full project ZIP
+        </div>
+        <div class="upload-sub mt-1" style="font-size:.73rem;color:var(--text-3);">
+          ⚠ <code>.fmb</code> are compiled binaries — export to <code>.fmt</code>/<code>.xml</code> first via <code>ifcmp60</code>
+        </div>
+        <div id="fileList" class="file-preview"></div>
+      </div>
+      <input type="file" id="fileInput" name="files" multiple accept=".fmt,.xml,.rdf,.fmb,.rpt,.txt,.zip" class="d-none"/>
 
-            <div class="upload-zone mb-2" id="dropZone" onclick="document.getElementById('fileInput').click()">
-                <div class="fs-2 mb-2">&#128193;</div>
-                <div class="fw-semibold">Click to select files or drag &amp; drop</div>
-                <div class="text-muted small mt-1">
-                    Individual files: <code>.fmt</code> &nbsp;<code>.xml</code> &nbsp;<code>.rdf</code> &nbsp;<code>.rpt</code>
-                    &nbsp;&nbsp;|&nbsp;&nbsp;
-                    <strong>ZIP archive</strong> of an entire folder (extracted automatically)
-                </div>
-                <div class="text-muted small mt-1" style="font-size:0.78rem;">
-                    ⚠️ <code>.fmb</code> files are compiled binaries — export to <code>.fmt</code> or <code>.xml</code> first using <code>ifcmp60</code>
-                </div>
-                <div id="fileList" class="mt-2 small text-primary fw-semibold"></div>
-            </div>
-            <p class="text-muted small mb-3">
-                No file size limit. Upload a ZIP of your entire Oracle Forms project folder — all supported files inside are extracted and analyzed.
-            </p>
-            <input type="file" id="fileInput" name="files" multiple
-                   accept=".fmt,.xml,.rdf,.fmb,.rpt,.txt,.zip" class="d-none"/>
+      <p class="section-label mb-2">Or try built-in sample files</p>
+      <div class="row g-2 mb-4">
+        <div class="col-md-4 col-sm-6">
+          <label class="sample-check-item w-100">
+            <input type="checkbox" name="samples" value="PPIMNT_ALTER_DEC_INSTANCE.fmt"/>
+            <span>📄</span><span class="flex-fill" style="font-size:.8rem;">PPIMNT_ALTER_DEC_INSTANCE.fmt</span>
+            <span class="level-chip level-1">L5</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <label class="sample-check-item w-100">
+            <input type="checkbox" name="samples" value="PENPRN_DEATH_DA_CONTROL_PANEL.xml"/>
+            <span>📄</span><span class="flex-fill" style="font-size:.8rem;">PENPRN_DEATH_DA_CONTROL_PANEL.xml</span>
+            <span class="level-chip level-4">L4</span>
+          </label>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <label class="sample-check-item w-100">
+            <input type="checkbox" name="samples" value="SPPIMNT_ALTER_DEC_INSTANCE.fmb"/>
+            <span>📊</span><span class="flex-fill" style="font-size:.8rem;">PPIMNT_ALTER_DEC_INSTANCE.fmb</span>
+            <span class="tag">Binary</span>
+          </label>
+        </div>
+      </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary btn-sm">Analyze</button>
-                <button type="reset" class="btn btn-outline-secondary btn-sm">Clear</button>
-            </div>
-        </form>
-    </div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <button type="submit" class="btn btn-primary">📊 Run Analysis</button>
+        <button type="reset" class="btn btn-outline-secondary">Clear</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% if results %}
-<div class="row g-3 mb-4">
-    <div class="col-md-2 col-6">
-        <div class="card text-center py-3">
-            <div class="stat-number text-dark">{{ total }}</div>
-            <div class="small text-muted mt-1">Total Files</div>
-        </div>
-    </div>
-    <div class="col-md-2 col-6">
-        <div class="card text-center py-3">
-            <div class="stat-number text-success">{{ l1 }}</div>
-            <div class="small text-muted mt-1">L1 Trivial</div>
-        </div>
-    </div>
-    <div class="col-md-2 col-6">
-        <div class="card text-center py-3">
-            <div class="stat-number text-info">{{ l2 }}</div>
-            <div class="small text-muted mt-1">L2 Simple</div>
-        </div>
-    </div>
-    <div class="col-md-2 col-6">
-        <div class="card text-center py-3">
-            <div class="stat-number text-warning">{{ l3 }}</div>
-            <div class="small text-muted mt-1">L3 Moderate</div>
-        </div>
-    </div>
-    <div class="col-md-2 col-6">
-        <div class="card text-center py-3">
-            <div class="stat-number text-danger">{{ l4 }}</div>
-            <div class="small text-muted mt-1">L4 Complex</div>
-        </div>
-    </div>
-    <div class="col-md-2 col-6">
-        <div class="card text-center py-3">
-            <div class="stat-number" style="color:#212529;">{{ l5 }}</div>
-            <div class="small text-muted mt-1">L5 Very Complex</div>
-        </div>
-    </div>
+<!-- RESULTS HEADER -->
+<div class="results-hd fade-up fade-up-1">
+  <div class="results-hd-title">Analysis Results</div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="/analyze/export-pdf" class="btn btn-sm btn-outline-secondary">⬇ Export PDF</a>
+    <a href="/analyze/export-json" class="btn btn-sm btn-outline-secondary">⬇ Export JSON</a>
+    <a href="/convert" class="btn btn-sm btn-primary">Convert These →</a>
+  </div>
 </div>
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h6 class="fw-bold mb-0">Results</h6>
-    <div class="d-flex gap-2">
-        <a href="/analyze/export-pdf" class="btn btn-outline-danger btn-sm">⬇ Export PDF</a>
-        <a href="/analyze/export-json" class="btn btn-outline-secondary btn-sm">Export JSON</a>
-        <a href="/convert" class="btn btn-primary btn-sm">Convert These &rarr;</a>
-    </div>
+<!-- STATS -->
+<div class="stats-grid fade-up fade-up-2">
+  <div class="stat-card" style="border-top:2px solid var(--accent)">
+    <div class="stat-num">{{ total }}</div>
+    <div class="stat-label">Total Files</div>
+  </div>
+  <div class="stat-card" style="border-top:2px solid #22c55e">
+    <div class="stat-num" style="color:#22c55e">{{ l1 }}</div>
+    <div class="stat-label"><span class="level-chip level-1">L1</span> Trivial</div>
+  </div>
+  <div class="stat-card" style="border-top:2px solid #06b6d4">
+    <div class="stat-num" style="color:#06b6d4">{{ l2 }}</div>
+    <div class="stat-label"><span class="level-chip level-2">L2</span> Simple</div>
+  </div>
+  <div class="stat-card" style="border-top:2px solid #f97316">
+    <div class="stat-num" style="color:#f97316">{{ l3 }}</div>
+    <div class="stat-label"><span class="level-chip level-3">L3</span> Moderate</div>
+  </div>
+  <div class="stat-card" style="border-top:2px solid #ef4444">
+    <div class="stat-num" style="color:#ef4444">{{ l4 }}</div>
+    <div class="stat-label"><span class="level-chip level-4">L4</span> Complex</div>
+  </div>
+  <div class="stat-card" style="border-top:2px solid darkred">
+    <div class="stat-num" style="color:darkred">{{ l5 }}</div>
+    <div class="stat-label"><span class="level-chip level-5">L5</span> V.Complex</div>
+  </div>
 </div>
 
-{% for r in results %}
-{% set rep = r.report %}
-{% set all_triggers = rep.artifact.all_triggers() %}
-<div class="card mb-3 result-level-{{ rep.score }}">
-    <div class="card-header d-flex align-items-center justify-content-between py-2">
-        <div>
-            <span class="fw-bold">{{ rep.artifact.name }}</span>
-            <span class="badge bg-secondary ms-2">{{ rep.artifact.artifact_type }}</span>
-        </div>
-        <div class="text-end">
-            {% if rep.score == 1 %}
-            <span class="badge bg-success">L1 — {{ rep.label }}</span>
-            {% elif rep.score == 2 %}
-            <span class="badge bg-info text-dark">L2 — {{ rep.label }}</span>
-            {% elif rep.score == 3 %}
-            <span class="badge bg-warning text-dark">L3 — {{ rep.label }}</span>
-            {% elif rep.score == 4 %}
-            <span class="badge bg-danger">L4 — {{ rep.label }}</span>
-            {% else %}
-            <span class="badge text-white" style="background:#212529;">L5 — {{ rep.label }}</span>
-            {% endif %}
-            <div class="text-muted small mt-1">~{{ rep.estimated_effort_days }} days effort &nbsp;|&nbsp; {{ rep.raw_points }} pts</div>
-        </div>
+{% for r in results %}{% set rep = r.report %}{% set trig = rep.artifact.all_triggers() %}
+<div class="result-card fade-up result-level-{{ rep.score }}">
+  <div class="result-card-hd">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <span class="result-fname">{{ rep.artifact.name }}</span>
+      <span class="tag">{{ rep.artifact.artifact_type }}</span>
     </div>
-    <div class="card-body">
-        <div class="row g-3">
-
-            <!-- Left: Metrics + Trigger Detail -->
-            <div class="col-md-6">
-                <p class="text-muted small fw-semibold text-uppercase mb-2">Metrics</p>
-                {% for key, val in rep.breakdown.items() %}
-                {% if val %}
-                <div class="d-flex align-items-center gap-2 mb-1" style="font-size:0.82rem;">
-                    <span class="text-muted" style="min-width:160px;">{{ key.replace('_', ' ').title() }}</span>
-                    <span class="fw-semibold" style="min-width:24px;">{{ val }}</span>
-                    <div class="metric-bar-wrap">
-                        <div class="metric-bar-fill bg-{{ r.color }}"
-                             style="width:{{ [val * 10, 100] | min }}%"></div>
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-
-                {% if all_triggers %}
-                <p class="text-muted small fw-semibold text-uppercase mb-2 mt-3">
-                    Trigger Complexity Factors
-                    <span class="badge bg-secondary fw-normal ms-1" style="font-size:0.7rem;">{{ rep.artifact.artifact_type }}</span>
-                </p>
-                <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Trigger</th>
-                            <th class="text-center">Lines</th>
-                            <th>Factors detected</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for t in all_triggers %}
-                    <tr>
-                        <td class="fw-semibold text-nowrap">{{ t.name }}</td>
-                        <td class="text-center">{{ t.line_count }}</td>
-                        <td>
-                            {%- if t.has_dml -%}
-                            <span class="badge bg-warning text-dark me-1" title="INSERT/UPDATE/DELETE/MERGE inside trigger">DML</span>
-                            {%- endif -%}
-                            {%- if t.has_exec_sql -%}
-                            <span class="badge bg-danger me-1" title="EXECUTE IMMEDIATE or EXEC_SQL">Dyn SQL</span>
-                            {%- endif -%}
-                            {%- if t.has_cursor -%}
-                            <span class="badge bg-danger me-1" title="Explicit cursor declaration or cursor FOR loop">Cursor</span>
-                            {%- endif -%}
-                            {%- if t.has_loops -%}
-                            <span class="badge bg-secondary me-1" title="FOR / WHILE / LOOP construct">Loop</span>
-                            {%- endif -%}
-                            {%- if t.has_complex_logic -%}
-                            <span class="badge bg-secondary me-1" title="CASE / IF-ELSIF / complex branching">Complex</span>
-                            {%- endif -%}
-                            {%- if t.has_exception_handling -%}
-                            <span class="badge bg-info text-dark me-1" title="EXCEPTION … WHEN block">Exception</span>
-                            {%- endif -%}
-                            {%- if t.has_go_block -%}
-                            <span class="badge bg-light text-dark border me-1" title="GO_BLOCK navigation call">GO_BLOCK</span>
-                            {%- endif -%}
-                            {%- if t.has_go_item -%}
-                            <span class="badge bg-light text-dark border me-1" title="GO_ITEM navigation call">GO_ITEM</span>
-                            {%- endif -%}
-                            {%- if t.line_count > 30 -%}
-                            <span class="badge bg-secondary me-1" title="Trigger body exceeds 30 lines">&gt;30 lines</span>
-                            {%- endif -%}
-                            {%- if not (t.has_dml or t.has_exec_sql or t.has_cursor or t.has_loops or t.has_complex_logic or t.has_exception_handling or t.has_go_block or t.has_go_item or t.line_count > 30) -%}
-                            <span class="text-muted">—</span>
-                            {%- endif -%}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
-
-            <!-- Right: Complexity Factors + Migration Notes -->
-            <div class="col-md-6">
-                <p class="text-muted small fw-semibold text-uppercase mb-2">Why This Score</p>
-                <ul class="list-unstyled mb-0" style="font-size:0.82rem;">
-                    {% for reason in rep.reasons %}
-                    <li class="mb-1 text-muted">&#x2022; {{ reason }}</li>
-                    {% endfor %}
-                </ul>
-
-                {% if rep.migration_notes %}
-                <p class="text-muted small fw-semibold text-uppercase mb-2 mt-3">Migration Guidance (JEE)</p>
-                <ul class="list-unstyled mb-0" style="font-size:0.82rem;">
-                    {% for note in rep.migration_notes %}
-                    <li class="mb-2 text-muted">&#x2794; {{ note }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-
-        </div>
+    <div class="result-score-g">
+      {% if rep.score==1 %}<span class="level-chip level-1">L1 — {{ rep.label }}</span>
+      {% elif rep.score==2 %}<span class="level-chip level-2">L2 — {{ rep.label }}</span>
+      {% elif rep.score==3 %}<span class="level-chip level-3">L3 — {{ rep.label }}</span>
+      {% elif rep.score==4 %}<span class="level-chip level-4">L4 — {{ rep.label }}</span>
+      {% else %}<span class="level-chip level-5">L5 — {{ rep.label }}</span>{% endif %}
+      <span class="result-meta">~{{ rep.estimated_effort_days }}d &nbsp;·&nbsp; {{ rep.raw_points }} pts</span>
     </div>
-    <div class="card-footer text-muted small py-1">{{ rep.artifact.file_path }}</div>
+  </div>
+  <div class="result-body">
+    <div class="row g-4">
+      <div class="col-md-6">
+        {% if rep.breakdown.items()|list|length %}
+        <p class="section-label">Metrics Breakdown</p>
+        <div class="metrics-list mb-3">
+          {% for key,val in rep.breakdown.items() %}{% if val %}
+          <div class="metric-row">
+            <span class="metric-key">{{ key.replace('_',' ').title() }}</span>
+            <span class="metric-val">{{ val }}</span>
+            <div class="metric-bar-wrap">
+              <div class="metric-bar-fill" style="width:{{ [val*10,100]|min }}%;background:{% if rep.score<=2 %}#22c55e{% elif rep.score==3 %}#f97316{% elif rep.score==4 %}#ef4444{% else %}#94a3b8{% endif %};"></div>
+            </div>
+          </div>
+          {% endif %}{% endfor %}
+        </div>
+        {% endif %}
+        {% if trig %}
+        <p class="section-label">Trigger Factors</p>
+        <div class="trigger-wrap">
+          <table class="table table-sm table-bordered mb-0">
+            <thead class="table-light">
+              <tr><th>Trigger</th><th class="text-center" style="width:48px">Lines</th><th>Factors</th></tr>
+            </thead>
+            <tbody>
+            {% for t in trig %}
+            <tr>
+              <td class="text-mono" style="font-size:.77rem;">{{ t.name }}</td>
+              <td class="text-center" style="font-size:.77rem;">{{ t.line_count }}</td>
+              <td style="font-size:.73rem;">
+                {%- if t.has_dml %}<span class="fbadge fb-dml">DML</span>{%- endif -%}
+                {%- if t.has_exec_sql %}<span class="fbadge fb-dyn">DynSQL</span>{%- endif -%}
+                {%- if t.has_cursor %}<span class="fbadge fb-dyn">Cursor</span>{%- endif -%}
+                {%- if t.has_loops %}<span class="fbadge fb-mod">Loop</span>{%- endif -%}
+                {%- if t.has_complex_logic %}<span class="fbadge fb-mod">Complex</span>{%- endif -%}
+                {%- if t.has_exception_handling %}<span class="fbadge fb-inf">Except</span>{%- endif -%}
+                {%- if t.has_go_block %}<span class="fbadge fb-nav">GO_BLK</span>{%- endif -%}
+                {%- if t.has_go_item %}<span class="fbadge fb-nav">GO_ITM</span>{%- endif -%}
+                {%- if t.line_count>30 %}<span class="fbadge fb-mod">&gt;30L</span>{%- endif -%}
+                {%- if not (t.has_dml or t.has_exec_sql or t.has_cursor or t.has_loops or t.has_complex_logic or t.has_exception_handling or t.has_go_block or t.has_go_item or t.line_count>30) %}<span style="color:var(--text-3)">—</span>{%- endif -%}
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <p class="section-label">Why This Score</p>
+        <ul class="reason-list mb-3">
+          {% for reason in rep.reasons %}<li>{{ reason }}</li>{% endfor %}
+        </ul>
+        {% if rep.migration_notes %}
+        <p class="section-label">Migration Guidance</p>
+        <ul class="notes-list">
+          {% for note in rep.migration_notes %}<li>{{ note }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="result-footer">{{ rep.artifact.file_path }}</div>
 </div>
 {% endfor %}
 {% endif %}
 
 {% if errors %}
-<div class="card border-danger mb-4">
-    <div class="card-header text-danger">Errors</div>
-    <div class="card-body">
-        {% for e in errors %}
-        <div class="alert alert-danger py-2 mb-2 small">{{ e }}</div>
-        {% endfor %}
-    </div>
+<div class="card mt-3" style="border-color:#ef4444;">
+  <div class="card-header" style="color:#ef4444;">Errors</div>
+  <div class="card-body">
+    {% for e in errors %}<div class="alert alert-danger py-2 mb-2 small">{{ e }}</div>{% endfor %}
+  </div>
 </div>
 {% endif %}
-
 {% endblock %}
 
 {% block scripts %}
 <script>
-const zone = document.getElementById('dropZone');
-const input = document.getElementById('fileInput');
-const list  = document.getElementById('fileList');
-
-input.addEventListener('change', updateList);
-zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('drag-over');
-    input.files = e.dataTransfer.files;
-    updateList();
-});
-
-function updateList() {
-    const files = Array.from(input.files);
-    if (!files.length) { list.textContent = ''; return; }
-    const totalMB = (files.reduce((s, f) => s + f.size, 0) / (1024 * 1024)).toFixed(1);
-    list.textContent = files.map(f => f.name).join(', ')
-        + ` — ${files.length} file${files.length > 1 ? 's' : ''}, ${totalMB} MB`;
+const zone=document.getElementById('dropZone'),input=document.getElementById('fileInput'),list=document.getElementById('fileList');
+if(input){
+  input.addEventListener('change',updateList);
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');input.files=e.dataTransfer.files;updateList();});
+}
+function updateList(){
+  const files=Array.from(input.files);
+  if(!files.length){list.textContent='';return;}
+  const mb=(files.reduce((s,f)=>s+f.size,0)/(1024*1024)).toFixed(1);
+  list.textContent=files.map(f=>f.name).join(', ')+` — ${files.length} file${files.length>1?'s':''}, ${mb} MB`;
 }
 </script>
 {% endblock %}

@@ -1,182 +1,273 @@
 {% extends "base.html" %}
-{% block title %}{{ app_name }} — Home{% endblock %}
+{% block title %}{{ app_name }} — Oracle Migration Platform{% endblock %}
+
+{% block head %}
+<style>
+/* ── HERO ──────────────────────────────────────────────────────────── */
+.hero{
+  padding:0.5rem 0 3rem;position:relative;
+}
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--glow);border:1px solid rgba(79,110,247,.3);
+  border-radius:20px;padding:.3rem .85rem .3rem .5rem;
+  font-size:.72rem;font-family:'JetBrains Mono',monospace;font-weight:600;
+  color:var(--accent);letter-spacing:.04em;text-transform:uppercase;
+  margin-bottom:1.4rem;
+}
+.hero-kicker-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero-h1{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:clamp(2.4rem,7vw,4rem);letter-spacing:-.055em;line-height:1.04;
+  margin-bottom:1.2rem;
+}
+.hero-h1 .grad{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 55%,var(--accent) 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s linear infinite;
+}
+@keyframes shimmer{to{background-position:200% center}}
+.hero-p{font-size:1rem;color:var(--text-2);max-width:540px;line-height:1.7;margin-bottom:2rem;}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2.8rem;}
+.btn-cta{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--accent);color:#fff;
+  padding:.72rem 1.5rem;border-radius:var(--r-sm);
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.95rem;
+  transition:.2s;border:2px solid var(--accent);text-decoration:none;
+}
+.btn-cta:hover{background:var(--accent-h);border-color:var(--accent-h);transform:translateY(-2px);box-shadow:0 8px 28px var(--glow);color:#fff;text-decoration:none;}
+.btn-cta-ghost{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.72rem 1.5rem;border-radius:var(--r-sm);
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.95rem;
+  transition:.2s;border:2px solid var(--border-2);color:var(--text-2);text-decoration:none;
+}
+.btn-cta-ghost:hover{border-color:var(--text-3);color:var(--text);transform:translateY(-2px);text-decoration:none;}
+.arrow-icon{transition:transform .2s;}
+.btn-cta:hover .arrow-icon,.btn-cta-ghost:hover .arrow-icon{transform:translateX(4px);}
+
+/* HERO STATS */
+.hero-stats{
+  display:grid;grid-template-columns:repeat(4,auto);
+  gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:var(--r);
+  overflow:hidden;max-width:fit-content;
+}
+.hstat{
+  background:var(--surface);padding:.9rem 1.4rem;
+  display:flex;flex-direction:column;gap:.25rem;
+}
+.hstat-n{
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+  font-size:1.5rem;letter-spacing:-.04em;color:var(--text);line-height:1;
+}
+.hstat-l{font-size:.67rem;color:var(--text-3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-family:'JetBrains Mono',monospace;}
+@media(max-width:600px){.hero-stats{grid-template-columns:repeat(2,1fr);max-width:100%;}}
+
+/* HOW IT WORKS pipeline */
+.pipeline{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:1.4rem;}
+.pipe-step{
+  display:flex;align-items:center;gap:.4rem;
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:6px;padding:.35rem .7rem;
+  font-size:.75rem;font-weight:600;
+}
+.pipe-n{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-weight:700;font-family:'JetBrains Mono',monospace;flex-shrink:0;
+}
+.pipe-arrow{color:var(--text-3);font-size:.75rem;}
+
+/* Input list */
+.input-row{display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:var(--text-2);padding:.3rem 0;border-bottom:1px solid var(--border);}
+.input-row:last-child{border-bottom:none;}
+.score-row{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--text-2);padding:.25rem 0;}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* LEVEL GRID */
+.level-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;}
+@media(max-width:860px){.level-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:500px){.level-grid{grid-template-columns:repeat(2,1fr);}}
+.level-card{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:1rem .9rem;
+  transition:border-color .2s,transform .2s,box-shadow .2s;cursor:default;
+}
+.level-card:hover{transform:translateY(-3px);}
+.lc-1:hover{border-color:#22c55e;box-shadow:0 6px 20px rgba(34,197,94,.12);}
+.lc-2:hover{border-color:#06b6d4;box-shadow:0 6px 20px rgba(6,182,212,.12);}
+.lc-3:hover{border-color:#f97316;box-shadow:0 6px 20px rgba(249,115,22,.12);}
+.lc-4:hover{border-color:#ef4444;box-shadow:0 6px 20px rgba(239,68,68,.12);}
+.lc-5:hover{border-color:#94a3b8;box-shadow:0 6px 20px rgba(148,163,184,.12);}
+.lc-badge{margin-bottom:.55rem;}
+.lc-name{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:.3rem;}
+.lc-desc{font-size:.74rem;color:var(--text-2);line-height:1.45;margin-bottom:.5rem;}
+.lc-effort{font-size:.71rem;font-family:'JetBrains Mono',monospace;color:var(--text-3);}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="py-5 text-center">
-    <h1 class="h3 fw-bold mb-2">{{ app_name }}</h1>
-    <p class="text-muted mb-4" style="max-width:520px; margin:0 auto;">
-        Analyze the complexity of Oracle Forms and Reports, then auto-generate
-        <strong>Jakarta EE 10</strong> and <strong>JasperReports</strong> code.
-        Upload individual files, entire folders as a <strong>ZIP archive</strong>,
-        or mix both.
-    </p>
-    <div class="d-flex gap-2 justify-content-center flex-wrap">
-        <a href="/analyze" class="btn btn-primary">Analyze Files</a>
-        <a href="/convert" class="btn btn-outline-secondary">Convert &amp; Download</a>
-    </div>
+<!-- HERO -->
+<div class="hero fade-up fade-up-1">
+  <div class="hero-kicker">
+    <span class="hero-kicker-dot"></span>
+    Oracle Forms &amp; Reports Migration Platform
+  </div>
+  <h1 class="hero-h1">
+    Migrate legacy code<br>
+    <span class="grad">at machine speed.</span>
+  </h1>
+  <p class="hero-p">
+    Drop your Oracle <code>.fmt</code> / <code>.fmb</code> or Reports <code>.rdf</code> / <code>.xml</code> files —
+    get back complexity scores, Jakarta EE&nbsp;10 Maven projects, and JasperReports&nbsp;JRXML in seconds.
+  </p>
+  <div class="hero-actions">
+    <a href="/analyze" class="btn-cta">Analyze Files <span class="arrow-icon">→</span></a>
+    <a href="/convert" class="btn-cta-ghost">Convert &amp; Download <span class="arrow-icon">↓</span></a>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><span class="hstat-n">87</span><span class="hstat-l">Validated Reports</span></div>
+    <div class="hstat"><span class="hstat-n">5</span><span class="hstat-l">Complexity Levels</span></div>
+    <div class="hstat"><span class="hstat-n">L1→L5</span><span class="hstat-l">Re_Forms 21 Model</span></div>
+    <div class="hstat"><span class="hstat-n">JEE</span><span class="hstat-l">Jakarta Perseus Output</span></div>
+  </div>
 </div>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h6 class="card-title fw-bold">Complexity Analysis</h6>
-                <p class="card-text text-muted small">
-                    Upload Oracle Forms (.fmt, .xml) or Reports (.rdf, .xml) — individually,
-                    as a ZIP, or a mix — and get a complexity score from
-                    <strong>L1 (Trivial)</strong> to <strong>L5 (Very Complex)</strong>
-                    with per-trigger factor breakdowns and effort estimates.
-                </p>
-            </div>
-        </div>
+<!-- FEATURES -->
+<div class="row g-3 mb-4 fade-up fade-up-2">
+  <div class="col-lg-4 col-md-6">
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Complexity Analysis</div>
+      <p class="feat-text">Score from <strong>L1 Trivial</strong> to <strong>L5 Very Complex</strong> — per-trigger breakdowns, factor badges, effort estimates. Export to PDF or JSON.</p>
+      <a href="/analyze" class="feat-link">Run analysis <span>→</span></a>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h6 class="card-title fw-bold">Jakarta EE 10</h6>
-                <p class="card-text text-muted small">
-                    Oracle Forms &rarr; complete Maven project: JPA entity,
-                    CDI service bean (<code>@ApplicationScoped</code>),
-                    EJB facade (<code>@Stateless</code>), JAX-RS REST endpoint,
-                    JSF backing bean + XHTML view. Deployable on WildFly / Payara.
-                </p>
-            </div>
-        </div>
+  </div>
+  <div class="col-lg-4 col-md-6">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:var(--glow-2);border-color:rgba(18,192,160,.25)">☕</div>
+      <div class="feat-title">Perseus Jakarta EE</div>
+      <p class="feat-text">Oracle Forms → complete Maven project: JPA entity, CDI <code>@ApplicationScoped</code> service, <code>@Stateless</code> EJB, JAX-RS endpoint, JSF backing bean + XHTML view.</p>
+      <a href="/convert" class="feat-link">Convert now <span>→</span></a>
     </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <h6 class="card-title fw-bold">JasperReports</h6>
-                <p class="card-text text-muted small">
-                    Oracle Reports &rarr; full JRXML with all bands (Title, Header, Detail,
-                    Footer, Summary), migrated parameters, fields, and a Java runner class
-                    for PDF/XLSX export.
-                </p>
-            </div>
-        </div>
+  </div>
+  <div class="col-lg-4 col-md-6">
+    <div class="feat-card">
+      <div class="feat-icon" style="background:rgba(247,80,79,.1);border-color:rgba(247,80,79,.22)">📋</div>
+      <div class="feat-title">JasperReports</div>
+      <p class="feat-text">Oracle Reports → full JRXML with Title, Header, Detail, Footer, Summary bands. Migrated parameters &amp; fields. Java runner class for PDF/XLSX export included.</p>
+      <a href="/convert" class="feat-link">Convert now <span>→</span></a>
     </div>
+  </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-header">How It Works</div>
-    <div class="card-body">
-        <div class="steps-bar mb-4">
-            <div class="step active">1. Upload</div>
-            <div class="step active">2. Parse</div>
-            <div class="step active">3. Analyze</div>
-            <div class="step active">4. Convert</div>
-            <div class="step active">5. Download ZIP</div>
+<!-- HOW IT WORKS + QUICKSTART -->
+<div class="row g-3 mb-4 fade-up fade-up-3">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header">How It Works</div>
+      <div class="card-body">
+        <div class="pipeline">
+          <div class="pipe-step"><span class="pipe-n">1</span>Upload</div>
+          <span class="pipe-arrow">→</span>
+          <div class="pipe-step"><span class="pipe-n">2</span>Parse</div>
+          <span class="pipe-arrow">→</span>
+          <div class="pipe-step"><span class="pipe-n">3</span>Score</div>
+          <span class="pipe-arrow">→</span>
+          <div class="pipe-step"><span class="pipe-n">4</span>Convert</div>
+          <span class="pipe-arrow">→</span>
+          <div class="pipe-step"><span class="pipe-n">5</span>Download</div>
         </div>
-        <div class="row g-4">
-            <div class="col-md-6">
-                <h6 class="fw-semibold mb-2">Supported Input</h6>
-                <ul class="list-unstyled small text-muted mb-0">
-                    <li class="mb-1"><code>.fmt</code> &mdash; Oracle Forms text export</li>
-                    <li class="mb-1"><code>.fmb</code> / <code>.xml</code> &mdash; Oracle Forms XML export</li>
-                    <li class="mb-1"><code>.rdf</code> / <code>.xml</code> &mdash; Oracle Reports XML export</li>
-                    <li class="mb-1"><code>.rpt</code> &mdash; Oracle Reports text export</li>
-                    <li class="mb-1"><code>.zip</code> &mdash; ZIP archive containing any of the above (folders included)</li>
-                </ul>
-            </div>
-            <div class="col-md-6">
-                <h6 class="fw-semibold mb-2">Complexity Scoring Factors</h6>
-                <ul class="list-unstyled small text-muted mb-0">
-                    <li class="mb-1">Trigger count &amp; type weights (ON-INSERT/UPDATE/DELETE = weight 3)</li>
-                    <li class="mb-1">DML inside triggers (INSERT / UPDATE / DELETE / MERGE)</li>
-                    <li class="mb-1">Dynamic SQL (EXECUTE IMMEDIATE / EXEC_SQL)</li>
-                    <li class="mb-1">Explicit cursors, loops, CASE/ELSIF expressions</li>
-                    <li class="mb-1">Exception handling blocks</li>
-                    <li class="mb-1">Navigation calls (GO_BLOCK / GO_ITEM)</li>
-                    <li class="mb-1">Program units &amp; SQL query count</li>
-                </ul>
-            </div>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <p class="section-label">Supported Input</p>
+            <div class="input-row"><code>.fmt</code><span>Oracle Forms text export</span></div>
+            <div class="input-row"><code>.fmb .xml</code><span>Oracle Forms XML</span></div>
+            <div class="input-row"><code>.rdf .xml</code><span>Oracle Reports XML</span></div>
+            <div class="input-row"><code>.rpt</code><span>Oracle Reports text</span></div>
+            <div class="input-row"><code>.zip</code><span>Entire folder archive</span></div>
+          </div>
+          <div class="col-sm-6">
+            <p class="section-label">Scoring Factors</p>
+            <div class="score-row"><span class="sdot" style="background:#f97316"></span>Trigger count &amp; type weights</div>
+            <div class="score-row"><span class="sdot" style="background:#ef4444"></span>DML inside triggers</div>
+            <div class="score-row"><span class="sdot" style="background:#ef4444"></span>Dynamic SQL / EXECUTE IMMEDIATE</div>
+            <div class="score-row"><span class="sdot" style="background:#f97316"></span>Explicit cursors &amp; loops</div>
+            <div class="score-row"><span class="sdot" style="background:#06b6d4"></span>Exception handling blocks</div>
+            <div class="score-row"><span class="sdot" style="background:#94a3b8"></span>GO_BLOCK / GO_ITEM navigation</div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header">Quick Start</div>
+      <div class="card-body p-0">
+        <pre class="mb-0 rounded-0" style="border-radius:0 0 var(--r) var(--r);border:none;border-top:1px solid var(--border);"><span style="color:#4a5268"># Unzip &amp; run</span>
+unzip oracle_migrator_project.zip
+cd oracle_migrator_project
 
-<div class="card mb-4">
-    <div class="card-header">Quick Start</div>
-    <div class="card-body p-0">
-<pre class="mb-0 rounded-0">
-# Unzip and enter the project
-unzip oracle_migrator_project.zip &amp;&amp; cd oracle_migrator_project
-
-# Linux / macOS — creates venv automatically
+<span style="color:#4a5268"># Linux / macOS</span>
 chmod +x run.sh &amp;&amp; ./run.sh
 
-# Windows
+<span style="color:#4a5268"># Windows</span>
 run.bat
 
-# Open: http://localhost:5000
+<span style="color:#4a5268"># → http://localhost:5050</span>
 
-# --- CLI (venv-aware) ---
-./migrate.sh demo                              # run with sample files
-./migrate.sh analyze sample_files/            # analyze a directory
-./migrate.sh convert sample_files/ --target both --output ./out --zip
-</pre>
+<span style="color:#4a5268"># CLI mode</span>
+./migrate.sh analyze sample_files/
+./migrate.sh convert sample_files/ --target both</pre>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-header">Complexity Levels</div>
-    <div class="card-body">
-        <p class="text-muted small mb-3">
-            Every file is assigned one of five levels. <strong>Oracle Forms</strong> are scored on trigger
-            complexity; <strong>Oracle Reports</strong> use the Re_Forms&nbsp;21 metric model
-            (validated against 87 real reports).
-        </p>
-        <div class="row g-3">
-            <div class="col-md-4 col-lg">
-                <div class="border rounded p-3 h-100" style="border-color:#198754 !important;">
-                    <span class="badge bg-success mb-2">L1 &mdash; Trivial</span>
-                    <p class="small text-muted mb-1">
-                        Very few triggers &middot; No DML &middot; No cursors &middot;
-                        Minimal PL/SQL &middot; Reports score &lt;&nbsp;25
-                    </p>
-                    <p class="small mb-0">Effort: <strong>&lt; 1 day</strong></p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg">
-                <div class="border rounded p-3 h-100" style="border-color:#0dcaf0 !important;">
-                    <span class="badge bg-info text-dark mb-2">L2 &mdash; Simple</span>
-                    <p class="small text-muted mb-1">
-                        A few triggers &middot; Basic validation &middot; Light exception handling &middot;
-                        Reports score 25&ndash;49
-                    </p>
-                    <p class="small mb-0">Effort: <strong>1&ndash;3 days</strong></p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg">
-                <div class="border rounded p-3 h-100" style="border-color:#fd7e14 !important;">
-                    <span class="badge mb-2 text-white" style="background:#fd7e14;">L3 &mdash; Moderate</span>
-                    <p class="small text-muted mb-1">
-                        DML in triggers &middot; Explicit cursors or loops &middot;
-                        Navigation calls &middot; Reports score 50&ndash;74
-                    </p>
-                    <p class="small mb-0">Effort: <strong>5&ndash;10 days</strong></p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg">
-                <div class="border rounded p-3 h-100" style="border-color:#dc3545 !important;">
-                    <span class="badge bg-danger mb-2">L4 &mdash; Complex</span>
-                    <p class="small text-muted mb-1">
-                        Dynamic SQL &middot; ON-INSERT / UPDATE / DELETE &middot;
-                        Many program units &middot; Reports score 75&ndash;99
-                    </p>
-                    <p class="small mb-0">Effort: <strong>10&ndash;20 days</strong></p>
-                </div>
-            </div>
-            <div class="col-md-4 col-lg">
-                <div class="border rounded p-3 h-100" style="border-color:#212529 !important;">
-                    <span class="badge text-white mb-2" style="background:#212529;">L5 &mdash; Very Complex</span>
-                    <p class="small text-muted mb-1">
-                        High trigger density &middot; EXECUTE IMMEDIATE &middot;
-                        Extensive PL/SQL &middot; Reports score &ge;&nbsp;100
-                    </p>
-                    <p class="small mb-0">Effort: <strong>20+ days</strong></p>
-                </div>
-            </div>
-        </div>
+<!-- COMPLEXITY LEVELS -->
+<div class="card mb-5 fade-up fade-up-4">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <span>Complexity Levels</span>
+    <span class="tag" style="font-size:.68rem;">Using Validation Rules from Re_Forms 21 Analyzer · validated on 87 real reports</span>
+  </div>
+  <div class="card-body">
+    <div class="level-grid">
+      <div class="level-card lc-1">
+        <div class="lc-badge"><span class="level-chip level-1">L1</span></div>
+        <div class="lc-name">Trivial</div>
+        <div class="lc-desc">Few triggers · No DML · No cursors · Reports &lt;25</div>
+        <div class="lc-effort">≤ 0.5 days</div>
+      </div>
+      <div class="level-card lc-2">
+        <div class="lc-badge"><span class="level-chip level-2">L2</span></div>
+        <div class="lc-name">Simple</div>
+        <div class="lc-desc">Basic validation · Light exceptions · Reports 25–49</div>
+        <div class="lc-effort">1–3 days</div>
+      </div>
+      <div class="level-card lc-3">
+        <div class="lc-badge"><span class="level-chip level-3">L3</span></div>
+        <div class="lc-name">Moderate</div>
+        <div class="lc-desc">DML triggers · Cursors/loops · Navigation · Reports 50–74</div>
+        <div class="lc-effort">5–8 days</div>
+      </div>
+      <div class="level-card lc-4">
+        <div class="lc-badge"><span class="level-chip level-4">L4</span></div>
+        <div class="lc-name">Complex</div>
+        <div class="lc-desc">Dynamic SQL · ON-INSERT/UPDATE · Program units · Reports 75–99</div>
+        <div class="lc-effort">10–20 days</div>
+      </div>
+      <div class="level-card lc-5">
+        <div class="lc-badge"><span class="level-chip level-5">L5</span></div>
+        <div class="lc-name">Very Complex</div>
+        <div class="lc-desc">EXECUTE IMMEDIATE · High density · Extensive PL/SQL · Reports ≥100</div>
+        <div class="lc-effort">20+ days</div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,207 +1,231 @@
 {% extends "base.html" %}
 {% block title %}Convert — {{ app_name }}{% endblock %}
 
+{% block head %}
+<style>
+.file-preview{margin-top:.65rem;font-size:.78rem;color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:500;}
+/* Target selection cards */
+.target-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem;}
+@media(max-width:600px){.target-grid{grid-template-columns:1fr;}}
+.target-card{
+  position:relative;cursor:pointer;border:2px solid var(--border);
+  border-radius:var(--r);padding:1.2rem;background:var(--surface-2);
+  transition:border-color .2s,background .2s,box-shadow .2s,transform .2s;
+  overflow:hidden;
+}
+.target-card input[type=radio]{position:absolute;opacity:0;pointer-events:none;}
+.target-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 0 0,var(--glow),transparent 65%);
+  opacity:0;transition:opacity .3s;
+}
+.target-card:hover{border-color:var(--border-2);transform:translateY(-2px);}
+.target-card:has(input:checked){border-color:var(--accent);background:var(--glow);box-shadow:0 0 0 3px var(--glow);}
+.target-card:has(input:checked)::before{opacity:1;}
+.tc-check{
+  position:absolute;top:.65rem;right:.75rem;
+  width:20px;height:20px;border-radius:50%;
+  border:2px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;color:transparent;transition:.15s;
+}
+.target-card:has(input:checked) .tc-check{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tc-icon{font-size:1.6rem;margin-bottom:.65rem;display:block;}
+.tc-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.25rem;}
+.tc-sub{font-size:.78rem;color:var(--text-2);line-height:1.45;}
+.tc-rec{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--accent);color:#fff;font-size:.65rem;
+  font-weight:700;text-align:center;padding:.22rem;letter-spacing:.06em;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* Success banner */
+.success-banner{
+  display:flex;align-items:center;gap:1.2rem;
+  background:var(--surface);border:2px solid #22c55e;border-radius:var(--r);
+  padding:1.3rem 1.5rem;margin-bottom:1.4rem;flex-wrap:wrap;
+  box-shadow:0 0 0 4px rgba(34,197,94,.1);
+}
+.success-icon-wrap{
+  width:48px;height:48px;border-radius:12px;
+  background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.3);
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;
+}
+.success-title{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.2rem;}
+.success-sub{font-size:.82rem;color:var(--text-2);}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="fw-bold mb-0">Convert Oracle Files</h5>
+<div class="page-hd fade-up fade-up-1">
+  <div class="page-eyebrow">Oracle Migration Tool</div>
+  <h2 class="page-title">Convert Oracle Files</h2>
+  <p class="page-sub">Upload your Oracle artifacts and generate ready-to-run Jakarta EE&nbsp;10 or JasperReports projects in one click.</p>
 </div>
 
 {% if not zip_ready %}
-<div class="card mb-4">
-    <div class="card-header">Upload &amp; Configure</div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data" id="convertForm">
+<div class="card mb-4 fade-up fade-up-2">
+  <div class="card-header">Upload &amp; Configure</div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data" id="convertForm">
+      <div class="upload-zone mb-3" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">⚙</div>
+        <div class="upload-title">Drop files here or click to browse</div>
+        <div class="upload-sub"><code>.fmt</code> &nbsp;<code>.fmb</code> &nbsp;<code>.xml</code> &nbsp;<code>.rdf</code> &nbsp;<code>.rpt</code> &nbsp;<code>.zip</code></div>
+        <div id="fileList" class="file-preview"></div>
+      </div>
+      <input type="file" id="fileInput" name="files" multiple accept=".fmt,.xml,.rdf,.fmb,.rpt,.txt,.zip" class="d-none"/>
 
-            <div class="upload-zone mb-2" id="dropZone" onclick="document.getElementById('fileInput').click()">
-                <div class="fs-2 mb-2">&#9881;</div>
-                <div class="fw-semibold">Click to select files or drag &amp; drop</div>
-                <div class="text-muted small mt-1">
-                    Individual files: <code>.fmt</code> &nbsp;<code>.fmb</code> &nbsp;<code>.xml</code> &nbsp;<code>.rdf</code> &nbsp;<code>.rpt</code>
-                    &nbsp;&nbsp;|&nbsp;&nbsp;
-                    <strong>ZIP archive</strong> of an entire folder (extracted automatically)
-                </div>
-                <div id="fileList" class="mt-2 small text-primary fw-semibold"></div>
-            </div>
-            <p class="text-muted small mb-3">
-                No file size limit. Upload a ZIP of your entire Oracle Forms project folder — all supported files inside are extracted and converted.
-            </p>
-            <input type="file" id="fileInput" name="files" multiple
-                   accept=".fmt,.xml,.rdf,.fmb,.rpt,.txt,.zip" class="d-none"/>
+      <p class="section-label mb-2">Or use built-in sample files</p>
+      <div class="row g-2 mb-4">
+        {% for s in samples %}
+        <div class="col-md-4 col-sm-6">
+          <label class="sample-check-item w-100">
+            <input type="checkbox" name="samples" value="{{ s }}"/>
+            <span style="font-size:.9rem;">{% if s.endswith('.xml') %}📊{% else %}📄{% endif %}</span>
+            <span class="flex-fill text-mono" style="font-size:.79rem;">{{ s }}</span>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">Or use built-in sample files:</label>
-                <div class="row g-2">
-                    {% for s in samples %}
-                    <div class="col-md-4 col-sm-6">
-                        <label class="sample-check-item w-100">
-                            <input type="checkbox" name="samples" value="{{ s }}"/>
-                            {{ s }}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+      <p class="section-label mb-2">Conversion Target</p>
+      <div class="target-grid mb-4">
+        <label class="target-card">
+          <input type="radio" name="target" value="java"/>
+          <div class="tc-check">✓</div>
+          <span class="tc-icon">☕</span>
+          <div class="tc-title">Perseus Jakarta EE</div>
+          <div class="tc-sub">JPA · CDI · EJB · JAX-RS · JSF</div>
+        </label>
+        <label class="target-card">
+          <input type="radio" name="target" value="jasper"/>
+          <div class="tc-check">✓</div>
+          <span class="tc-icon">📋</span>
+          <div class="tc-title">JasperReports</div>
+          <div class="tc-sub">JRXML with all bands + Java runner</div>
+        </label>
+        <label class="target-card" style="padding-bottom:2.2rem;">
+          <input type="radio" name="target" value="both" checked/>
+          <div class="tc-check">✓</div>
+          <span class="tc-icon">⚡</span>
+          <div class="tc-title">Both Targets</div>
+          <div class="tc-sub">Recommended — generates all outputs in one ZIP</div>
+          <div class="tc-rec">Recommended</div>
+        </label>
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">Conversion target:</label>
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <label class="sample-check-item w-100">
-                            <input type="radio" name="target" value="java"/>
-                            <div>
-                                <div class="fw-semibold">Jakarta EE 10</div>
-                                <div class="text-muted" style="font-size:0.78rem;">JPA · CDI · EJB · JAX-RS · JSF</div>
-                            </div>
-                        </label>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="sample-check-item w-100">
-                            <input type="radio" name="target" value="jasper"/>
-                            <div>
-                                <div class="fw-semibold">JasperReports</div>
-                                <div class="text-muted" style="font-size:0.78rem;">JRXML with all bands + Java runner</div>
-                            </div>
-                        </label>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="sample-check-item w-100" style="border-color:#0d6efd; background:#f0f6ff;">
-                            <input type="radio" name="target" value="both" checked/>
-                            <div>
-                                <div class="fw-semibold">Both targets</div>
-                                <div class="text-muted" style="font-size:0.78rem;">Recommended — generates all outputs</div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex gap-2 align-items-center">
-                <button type="submit" class="btn btn-primary btn-sm">Convert &amp; Generate ZIP</button>
-                <span class="text-muted small">You'll download a ZIP ready to unzip and run.</span>
-            </div>
-        </form>
-    </div>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <button type="submit" class="btn btn-primary">⚡ Convert &amp; Generate ZIP</button>
+        <span class="text-muted" style="font-size:.79rem;">You'll download a ZIP ready to unzip and run.</span>
+      </div>
+    </form>
+  </div>
 </div>
 
 {% else %}
-<div class="alert alert-success">Conversion complete. Your files are ready to download.</div>
-
-<div class="card mb-4">
-    <div class="card-header">Download</div>
-    <div class="card-body text-center py-4">
-        <a href="/download/{{ run_id }}" class="btn btn-success">Download ZIP</a>
-        <p class="text-muted small mt-2 mb-0">Contains all generated files organized by artifact name.</p>
-    </div>
+<!-- SUCCESS STATE -->
+<div class="success-banner fade-up fade-up-1">
+  <div class="success-icon-wrap">✅</div>
+  <div class="flex-fill">
+    <div class="success-title">Conversion Complete</div>
+    <div class="success-sub">Your project ZIP is ready to download and run.</div>
+  </div>
+  <a href="/download/{{ run_id }}" class="btn btn-primary btn-lg">⬇ Download ZIP</a>
 </div>
 
-<h6 class="fw-bold mb-3">Converted artifacts</h6>
-<table class="table table-sm table-bordered bg-white">
-    <thead class="table-light">
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Complexity</th>
-            <th>Files generated</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for c in converted %}
-    <tr>
-        <td class="fw-semibold">{{ c.name }}</td>
-        <td><span class="badge bg-secondary">{{ c.type }}</span></td>
+<div class="card mb-4 fade-up fade-up-2">
+  <div class="card-header">Converted Artifacts</div>
+  <div class="card-body p-0">
+    <table class="table table-sm table-bordered mb-0" style="border-radius:0 0 var(--r) var(--r);overflow:hidden;">
+      <thead class="table-light">
+        <tr><th>Name</th><th>Type</th><th>Complexity</th><th>Files generated</th></tr>
+      </thead>
+      <tbody>
+      {% for c in converted %}
+      <tr>
+        <td class="text-mono" style="font-size:.83rem;font-weight:500;">{{ c.name }}</td>
+        <td><span class="tag">{{ c.type }}</span></td>
         <td>
-            {% if c.complexity_score == 1 %}
-            <span class="badge bg-success">{{ c.complexity }}</span>
-            {% elif c.complexity_score == 2 %}
-            <span class="badge bg-info text-dark">{{ c.complexity }}</span>
-            {% elif c.complexity_score == 3 %}
-            <span class="badge bg-warning text-dark">{{ c.complexity }}</span>
-            {% elif c.complexity_score == 4 %}
-            <span class="badge bg-danger">{{ c.complexity }}</span>
-            {% else %}
-            <span class="badge text-white" style="background:#212529;">{{ c.complexity }}</span>
-            {% endif %}
+          {% if c.complexity_score==1 %}<span class="level-chip level-1">{{ c.complexity }}</span>
+          {% elif c.complexity_score==2 %}<span class="level-chip level-2">{{ c.complexity }}</span>
+          {% elif c.complexity_score==3 %}<span class="level-chip level-3">{{ c.complexity }}</span>
+          {% elif c.complexity_score==4 %}<span class="level-chip level-4">{{ c.complexity }}</span>
+          {% else %}<span class="level-chip level-5">{{ c.complexity }}</span>{% endif %}
         </td>
-        <td>{{ c.files_count }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+        <td style="font-size:.81rem;color:var(--text-2);">{{ c.files_count }} files</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-<div class="card mb-4">
-    <div class="card-header">How to run the generated code</div>
-    <div class="card-body">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <p class="fw-semibold small mb-1">Jakarta EE 10 (WildFly / Payara)</p>
-<pre class="mb-0">cd &lt;artifact&gt;/jee/
+<div class="row g-3 mb-4 fade-up fade-up-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">☕ Jakarta EE 10 — WildFly / Payara</div>
+      <div class="card-body p-0">
+<pre class="mb-0 rounded-0" style="border-radius:0 0 var(--r) var(--r);border:none;border-top:1px solid var(--border);"><span style="color:#4a5268">cd &lt;artifact&gt;/jee/</span>
 
-# Build the WAR
+<span style="color:#4a5268"># Build WAR</span>
 mvn clean package
 
-# Deploy to WildFly
+<span style="color:#4a5268"># Deploy to WildFly</span>
 cp target/*.war $WILDFLY_HOME/standalone/deployments/
 
-# Or use embedded Arquillian for tests
+<span style="color:#4a5268"># Run tests via Arquillian</span>
 mvn test</pre>
-            </div>
-            <div class="col-md-6">
-                <p class="fw-semibold small mb-1">JasperReports</p>
-<pre class="mb-0">cd &lt;artifact&gt;/jasper/
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">📋 JasperReports — PDF / XLSX</div>
+      <div class="card-body p-0">
+<pre class="mb-0 rounded-0" style="border-radius:0 0 var(--r) var(--r);border:none;border-top:1px solid var(--border);">cd &lt;artifact&gt;/jasper/
 mvn jasperreports:compile-reports
 
 export DB_URL=jdbc:oracle:thin:@...
-export DB_USER=user
-export DB_PASS=pass
+export DB_USER=user DB_PASS=pass
 
 java -cp "target/*" &lt;Name&gt;Runner out.pdf</pre>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
 
-<div class="d-flex gap-2">
-    <a href="/convert" class="btn btn-primary btn-sm">Convert More Files</a>
-    <a href="/analyze" class="btn btn-outline-secondary btn-sm">Analyze More Files</a>
+<div class="d-flex gap-2 fade-up fade-up-4">
+  <a href="/convert" class="btn btn-primary btn-sm">Convert More Files</a>
+  <a href="/analyze" class="btn btn-outline-secondary btn-sm">Analyze More Files</a>
 </div>
 {% endif %}
 
 {% if errors %}
-<div class="card border-danger mt-3">
-    <div class="card-header text-danger">Errors</div>
-    <div class="card-body">
-        {% for e in errors %}
-        <div class="alert alert-danger py-2 mb-2 small">{{ e }}</div>
-        {% endfor %}
-    </div>
+<div class="card mt-3" style="border-color:#ef4444;">
+  <div class="card-header" style="color:#ef4444;">Errors</div>
+  <div class="card-body">
+    {% for e in errors %}<div class="alert alert-danger py-2 mb-2 small">{{ e }}</div>{% endfor %}
+  </div>
 </div>
 {% endif %}
-
 {% endblock %}
 
 {% block scripts %}
 <script>
-const zone  = document.getElementById('dropZone');
-const input = document.getElementById('fileInput');
-const list  = document.getElementById('fileList');
-if (input) {
-    input.addEventListener('change', updateList);
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        input.files = e.dataTransfer.files;
-        updateList();
-    });
+const zone=document.getElementById('dropZone'),input=document.getElementById('fileInput'),list=document.getElementById('fileList');
+if(input){
+  input.addEventListener('change',updateList);
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');input.files=e.dataTransfer.files;updateList();});
 }
-function updateList() {
-    if (!list || !input) return;
-    const files = Array.from(input.files);
-    if (!files.length) { list.textContent = ''; return; }
-    const totalMB = (files.reduce((s, f) => s + f.size, 0) / (1024 * 1024)).toFixed(1);
-    list.textContent = files.map(f => f.name).join(', ')
-        + ` — ${files.length} file${files.length > 1 ? 's' : ''}, ${totalMB} MB`;
+function updateList(){
+  const files=Array.from(input.files);
+  if(!files.length){list.textContent='';return;}
+  const mb=(files.reduce((s,f)=>s+f.size,0)/(1024*1024)).toFixed(1);
+  list.textContent=files.map(f=>f.name).join(', ')+` — ${files.length} file${files.length>1?'s':''}, ${mb} MB`;
 }
 </script>
 {% endblock %}
