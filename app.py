@@ -1,5 +1,5 @@
 """
-eEFKA Oracle Forms Migrator — Flask Web Application
+oracle-migrator — Flask Web Application
 """
 import os
 import re
@@ -11,15 +11,7 @@ import traceback
 from pathlib import Path
 from datetime import datetime
 
-from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import mm
-from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
-from reportlab.platypus import (
-    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, KeepTogether
-)
+from oracle_migrator.report_engine import ReportEngine, AnalysisReportDTO
 
 from flask import (
     Flask, request, render_template, redirect, url_for,
@@ -36,15 +28,15 @@ from oracle_migrator.converters import JavaConverter, JasperConverter
 # ── App setup ─────────────────────────────────────────────────────────────────
 
 app = Flask(__name__, template_folder="oracle_migrator/templates_html")
-app.secret_key = os.environ.get("SECRET_KEY", "eefka-migrator-dev-key-change-in-prod")
+app.secret_key = os.environ.get("SECRET_KEY", "oracle-migrator-dev-key-change-in-prod")
 
 # No upload size cap — we handle large folders and ZIPs.
 # Set via env var EFKA_MAX_UPLOAD_MB if you need a hard limit (default: unlimited).
 _max_mb = os.environ.get("EFKA_MAX_UPLOAD_MB")
 app.config["MAX_CONTENT_LENGTH"] = int(_max_mb) * 1024 * 1024 if _max_mb else None
 
-UPLOAD_FOLDER = Path(tempfile.gettempdir()) / "eefka_migrator_uploads"
-OUTPUT_FOLDER = Path(tempfile.gettempdir()) / "eefka_migrator_outputs"
+UPLOAD_FOLDER = Path(tempfile.gettempdir()) / "oracle_migrator_uploads"
+OUTPUT_FOLDER = Path(tempfile.gettempdir()) / "oracle_migrator_outputs"
 UPLOAD_FOLDER.mkdir(exist_ok=True)
 OUTPUT_FOLDER.mkdir(exist_ok=True)
 
@@ -56,7 +48,7 @@ UPLOAD_EXTENSIONS = ORACLE_EXTENSIONS | {".zip"}
 
 SAMPLE_DIR = Path(__file__).parent / "sample_files"
 
-APP_NAME = "eEFKA Oracle Forms Migrator"
+APP_NAME = "oracle-migrator"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -294,6 +286,27 @@ def analyze():
                            )
 
 
+@app.route("/analyze/export-pdf")
+def export_pdf():
+    """
+    PDF export endpoint — mirrors DashboardController.printReport().
+    Uses ReportEngine (JasperEngine pattern) + AnalysisReportDTO (bean DTO pattern).
+    """
+    data = session.get("last_results", [])
+    if not data:
+        flash("No analysis results to export.", "warning")
+        return redirect(url_for("analyze"))
+
+    # Build DTO from session — mirrors createDummyRecord() / bean collection pattern
+    dto = AnalysisReportDTO.from_session(data)
+
+    # Compile → fill → export (mirrors JasperEngine.renderReport one-shot path)
+    buf = ReportEngine.render_and_export(dto)
+
+    fname = f"complexity_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    return send_file(buf, as_attachment=True, download_name=fname, mimetype="application/pdf")
+
+
 @app.route("/analyze/export-json")
 def export_json():
     data = session.get("last_results", [])
@@ -303,197 +316,11 @@ def export_json():
     tmp = tempfile.mktemp(suffix=".json")
     Path(tmp).write_text(json.dumps(data, indent=2))
     return send_file(tmp, as_attachment=True,
-                     download_name=f"eefka_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                     download_name=f"oracle_migrator_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                      mimetype="application/json")
 
 
-@app.route("/analyze/export-pdf")
-def export_pdf():
 
-    data = session.get("last_results", [])
-    if not data:
-        flash("No analysis results to export.", "warning")
-        return redirect(url_for("analyze"))
-
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buf, pagesize=A4,
-        leftMargin=18*mm, rightMargin=18*mm,
-        topMargin=18*mm, bottomMargin=18*mm,
-        title="Oracle Complexity Analysis Report",
-    )
-
-    # ── Colour palette for 5 levels ──────────────────────────────────────────
-    LEVEL_HEX = {
-        1: "198754",
-        2: "0dcaf0",
-        3: "fd7e14",
-        4: "dc3545",
-        5: "212529",
-    }
-    LEVEL_BG = {
-        1: colors.HexColor("#d1e7dd"),
-        2: colors.HexColor("#cff4fc"),
-        3: colors.HexColor("#fff3cd"),
-        4: colors.HexColor("#f8d7da"),
-        5: colors.HexColor("#e2e3e5"),
-    }
-    LEVEL_COLORS = {k: colors.HexColor(f"#{v}") for k, v in LEVEL_HEX.items()}
-    LEVEL_NAMES = {1: "Trivial", 2: "Simple", 3: "Moderate", 4: "Complex", 5: "Very Complex"}
-
-    styles = getSampleStyleSheet()
-    normal     = styles["Normal"]
-    h1         = ParagraphStyle("H1", parent=styles["Title"],   fontSize=18, spaceAfter=4,  textColor=colors.HexColor("#0d6efd"))
-    h2         = ParagraphStyle("H2", parent=styles["Heading2"],fontSize=11, spaceBefore=10,spaceAfter=3, textColor=colors.HexColor("#212529"))
-    small_grey = ParagraphStyle("SG", parent=normal, fontSize=8,  textColor=colors.grey)
-    mono       = ParagraphStyle("Mono",parent=normal,fontSize=8,  fontName="Courier", textColor=colors.HexColor("#495057"))
-    reason_sty = ParagraphStyle("RS", parent=normal,fontSize=8.5,leading=12, textColor=colors.HexColor("#495057"))
-    badge_sty  = ParagraphStyle("BS", parent=normal,fontSize=9,   alignment=TA_CENTER)
-
-    story = []
-
-    # ── Title block ──────────────────────────────────────────────────────────
-    story.append(Paragraph("Oracle Forms &amp; Reports", h1))
-    story.append(Paragraph("Complexity Analysis Report", ParagraphStyle(
-        "Sub", parent=styles["Normal"], fontSize=13, textColor=colors.HexColor("#6c757d"), spaceAfter=2)))
-    story.append(Paragraph(
-        f"Generated: {datetime.now().strftime('%d %b %Y, %H:%M')} &nbsp;|&nbsp; {len(data)} file(s) analysed",
-        small_grey))
-    story.append(Spacer(1, 6*mm))
-
-    # ── Summary table ─────────────────────────────────────────────────────────
-    counts = {i: sum(1 for d in data if d.get("complexity_level") == i) for i in range(1, 6)}
-    summary_rows = [
-        [Paragraph("<b>Level</b>", badge_sty),
-         Paragraph("<b>Label</b>",  badge_sty),
-         Paragraph("<b>Count</b>",  badge_sty),
-         Paragraph("<b>% of total</b>", badge_sty)],
-    ]
-    for lvl in range(1, 6):
-        cnt = counts[lvl]
-        pct = f"{cnt/len(data)*100:.0f}%" if data else "0%"
-        summary_rows.append([
-            Paragraph(f"<b>L{lvl}</b>", ParagraphStyle("Lv", parent=badge_sty, textColor=LEVEL_COLORS[lvl])),
-            Paragraph(LEVEL_NAMES[lvl], badge_sty),
-            Paragraph(str(cnt), badge_sty),
-            Paragraph(pct, badge_sty),
-        ])
-    sum_tbl = Table(summary_rows, colWidths=[22*mm, 50*mm, 28*mm, 35*mm])
-    sum_tbl.setStyle(TableStyle([
-        ("BACKGROUND",  (0,0), (-1,0), colors.HexColor("#e9ecef")),
-        ("FONTNAME",    (0,0), (-1,0), "Helvetica-Bold"),
-        ("FONTSIZE",    (0,0), (-1,-1), 9),
-        ("GRID",        (0,0), (-1,-1), 0.5, colors.HexColor("#dee2e6")),
-        ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.white, colors.HexColor("#f8f9fa")]),
-        ("VALIGN",      (0,0), (-1,-1), "MIDDLE"),
-        ("TOPPADDING",  (0,0), (-1,-1), 4),
-        ("BOTTOMPADDING",(0,0),(-1,-1), 4),
-    ]))
-    story.append(sum_tbl)
-    story.append(Spacer(1, 8*mm))
-    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#dee2e6")))
-    story.append(Spacer(1, 4*mm))
-
-    # ── Per-file detail cards ─────────────────────────────────────────────────
-    story.append(Paragraph("File Details", h2))
-    story.append(Spacer(1, 2*mm))
-
-    for d in data:
-        lvl   = d.get("complexity_level", 1)
-        name  = Path(d.get("file", "?")).name
-        atype = d.get("artifact_type", "")
-        label = d.get("label", "")
-        pts   = d.get("raw_points", 0)
-        effort= d.get("estimated_effort_days", 0)
-        grade = d.get("grade", "")
-        reasons = d.get("reasons", [])
-        breakdown = d.get("breakdown", {})
-
-        bg   = LEVEL_BG[lvl]
-        col  = LEVEL_COLORS[lvl]
-
-        # Header row
-        hdr_data = [[
-            Paragraph(f"<b>{name}</b>", ParagraphStyle("FN", parent=normal, fontSize=10)),
-            Paragraph(f"<font color='#6c757d'>{atype}</font>", small_grey),
-            Paragraph(
-                f"<b><font color='#{LEVEL_HEX[lvl]}'>L{lvl} — {LEVEL_NAMES[lvl]}</font></b>"
-                f"{'  (' + grade + ')' if grade and grade not in LEVEL_NAMES[lvl] else ''}",
-                ParagraphStyle("Lbl", parent=normal, fontSize=9, alignment=TA_RIGHT)),
-        ]]
-        hdr_tbl = Table(hdr_data, colWidths=[85*mm, 30*mm, 55*mm])
-        hdr_tbl.setStyle(TableStyle([
-            ("BACKGROUND", (0,0), (-1,-1), bg),
-            ("TOPPADDING",  (0,0), (-1,-1), 5),
-            ("BOTTOMPADDING",(0,0),(-1,-1), 5),
-            ("LEFTPADDING", (0,0), (0,0), 6),
-            ("RIGHTPADDING",(-1,0),(-1,0),6),
-            ("LINEBELOW", (0,0), (-1,-1), 1, col),
-        ]))
-
-        # Stats bar
-        stats_data = [[
-            Paragraph(f"<b>{pts}</b> pts", small_grey),
-            Paragraph(f"~<b>{effort}</b> days effort", small_grey),
-            Paragraph(f"File: <font name='Courier'>{d.get('file','')}</font>",
-                      ParagraphStyle("FP", parent=small_grey, fontSize=7)),
-        ]]
-        stats_tbl = Table(stats_data, colWidths=[25*mm, 35*mm, 110*mm])
-        stats_tbl.setStyle(TableStyle([
-            ("BACKGROUND", (0,0), (-1,-1), colors.HexColor("#f8f9fa")),
-            ("TOPPADDING",  (0,0), (-1,-1), 3),
-            ("BOTTOMPADDING",(0,0),(-1,-1), 3),
-            ("LEFTPADDING", (0,0), (0,0), 6),
-        ]))
-
-        # Body: breakdown + reasons side by side
-        body_rows = []
-
-        # Breakdown metrics
-        if breakdown:
-            bk_lines = [Paragraph("<b>Metric counts</b>", ParagraphStyle("MH", parent=small_grey, spaceAfter=2))]
-            for k, v in list(breakdown.items())[:20]:
-                bk_lines.append(Paragraph(
-                    f"<font color='#6c757d'>{k.replace('_',' ').title()}</font>: <b>{v}</b>",
-                    ParagraphStyle("ML", parent=small_grey, leading=10)))
-        else:
-            bk_lines = [Paragraph("—", small_grey)]
-
-        # Reasons
-        if reasons:
-            rs_lines = [Paragraph("<b>Scoring factors</b>", ParagraphStyle("RH", parent=small_grey, spaceAfter=2))]
-            for r in reasons[:20]:
-                rs_lines.append(Paragraph(f"• {r}", reason_sty))
-        else:
-            rs_lines = [Paragraph("—", small_grey)]
-
-        body_data = [[bk_lines, rs_lines]]
-        body_tbl = Table(body_data, colWidths=[85*mm, 85*mm])
-        body_tbl.setStyle(TableStyle([
-            ("VALIGN",       (0,0), (-1,-1), "TOP"),
-            ("TOPPADDING",   (0,0), (-1,-1), 6),
-            ("BOTTOMPADDING",(0,0), (-1,-1), 6),
-            ("LEFTPADDING",  (0,0), (-1,-1), 6),
-            ("RIGHTPADDING", (0,0), (-1,-1), 6),
-            ("LINEAFTER",    (0,0), (0,-1),  0.5, colors.HexColor("#dee2e6")),
-            ("BACKGROUND",   (0,0), (-1,-1), colors.white),
-        ]))
-
-        card = KeepTogether([hdr_tbl, stats_tbl, body_tbl, Spacer(1, 3*mm)])
-        story.append(card)
-
-    # ── Footer note ───────────────────────────────────────────────────────────
-    story.append(Spacer(1, 4*mm))
-    story.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#dee2e6")))
-    story.append(Spacer(1, 2*mm))
-    story.append(Paragraph(
-        "Generated by eEFKA Oracle Migrator · Re_Forms 21 scoring model (validated against 87 real reports)",
-        ParagraphStyle("Footer", parent=small_grey, alignment=TA_CENTER)))
-
-    doc.build(story)
-    buf.seek(0)
-    fname = f"complexity_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-    return send_file(buf, as_attachment=True, download_name=fname, mimetype="application/pdf")
 
 
 
@@ -562,7 +389,7 @@ def convert():
         flash("No files were successfully converted.", "danger")
         return redirect(url_for("convert"))
 
-    zip_path = OUTPUT_FOLDER / f"eefka_migrated_{run_id}.zip"
+    zip_path = OUTPUT_FOLDER / f"oracle_migrator_migrated_{run_id}.zip"
     with zipfile.ZipFile(str(zip_path), "w", zipfile.ZIP_DEFLATED) as zf:
         for f in out_root.rglob("*"):
             if f.is_file():
@@ -588,7 +415,7 @@ def download(run_id: str):
         flash("Download expired or not found. Please convert again.", "warning")
         return redirect(url_for("convert"))
     return send_file(zip_path, as_attachment=True,
-                     download_name=session.get("last_zip_name", f"eefka_migrated_{run_id}.zip"),
+                     download_name=session.get("last_zip_name", f"oracle_migrator_migrated_{run_id}.zip"),
                      mimetype="application/zip")
 
 
@@ -601,6 +428,11 @@ def samples():
                 art_type = detect_type(str(f))
                 sample_list.append({"name": f.name, "type": art_type, "size": f.stat().st_size})
     return render_template("samples.html", app_name=APP_NAME, samples=sample_list)
+
+
+@app.route("/content-types")
+def content_types():
+    return render_template("content_types.html", app_name=APP_NAME)
 
 
 @app.route("/api/analyze", methods=["POST"])
