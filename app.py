@@ -1,5 +1,5 @@
 """
-oracle-migrator — Flask Web Application
+oracle_migrator — Flask Web Application
 """
 import os
 import re
@@ -28,15 +28,15 @@ from oracle_migrator.converters import JavaConverter, JasperConverter
 # ── App setup ─────────────────────────────────────────────────────────────────
 
 app = Flask(__name__, template_folder="oracle_migrator/templates_html")
-app.secret_key = os.environ.get("SECRET_KEY", "oracle-migrator-dev-key-change-in-prod")
+app.secret_key = os.environ.get("SECRET_KEY", "oracle_migrator-dev-key-change-in-prod")
 
 # No upload size cap — we handle large folders and ZIPs.
 # Set via env var EFKA_MAX_UPLOAD_MB if you need a hard limit (default: unlimited).
 _max_mb = os.environ.get("EFKA_MAX_UPLOAD_MB")
 app.config["MAX_CONTENT_LENGTH"] = int(_max_mb) * 1024 * 1024 if _max_mb else None
 
-UPLOAD_FOLDER = Path(tempfile.gettempdir()) / "oracle_migrator_uploads"
-OUTPUT_FOLDER = Path(tempfile.gettempdir()) / "oracle_migrator_outputs"
+UPLOAD_FOLDER = Path(tempfile.gettempdir()) / "assert_cms_uploads"
+OUTPUT_FOLDER = Path(tempfile.gettempdir()) / "assert_cms_outputs"
 UPLOAD_FOLDER.mkdir(exist_ok=True)
 OUTPUT_FOLDER.mkdir(exist_ok=True)
 
@@ -48,7 +48,7 @@ UPLOAD_EXTENSIONS = ORACLE_EXTENSIONS | {".zip"}
 
 SAMPLE_DIR = Path(__file__).parent / "sample_files"
 
-APP_NAME = "oracle-migrator"
+APP_NAME = "oracle_migrator"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -316,7 +316,7 @@ def export_json():
     tmp = tempfile.mktemp(suffix=".json")
     Path(tmp).write_text(json.dumps(data, indent=2))
     return send_file(tmp, as_attachment=True,
-                     download_name=f"oracle_migrator_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                     download_name=f"assert_cms_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                      mimetype="application/json")
 
 
@@ -389,7 +389,7 @@ def convert():
         flash("No files were successfully converted.", "danger")
         return redirect(url_for("convert"))
 
-    zip_path = OUTPUT_FOLDER / f"oracle_migrator_migrated_{run_id}.zip"
+    zip_path = OUTPUT_FOLDER / f"assert_cms_migrated_{run_id}.zip"
     with zipfile.ZipFile(str(zip_path), "w", zipfile.ZIP_DEFLATED) as zf:
         for f in out_root.rglob("*"):
             if f.is_file():
@@ -415,7 +415,7 @@ def download(run_id: str):
         flash("Download expired or not found. Please convert again.", "warning")
         return redirect(url_for("convert"))
     return send_file(zip_path, as_attachment=True,
-                     download_name=session.get("last_zip_name", f"oracle_migrator_migrated_{run_id}.zip"),
+                     download_name=session.get("last_zip_name", f"assert_cms_migrated_{run_id}.zip"),
                      mimetype="application/zip")
 
 
