@@ -1,5 +1,5 @@
 """
-oracle_migrator — Flask Web Application
+assert-cms — Flask Web Application
 """
 import os
 import re
@@ -12,6 +12,7 @@ from pathlib import Path
 from datetime import datetime
 
 from oracle_migrator.report_engine import ReportEngine, AnalysisReportDTO
+from oracle_migrator.code_generator.engine import InputLoader, GeneratorEngine
 
 from flask import (
     Flask, request, render_template, redirect, url_for,
@@ -316,7 +317,7 @@ def export_json():
     tmp = tempfile.mktemp(suffix=".json")
     Path(tmp).write_text(json.dumps(data, indent=2))
     return send_file(tmp, as_attachment=True,
-                     download_name=f"ofm_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                     download_name=f"assert_cms_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                      mimetype="application/json")
 
 
@@ -389,7 +390,7 @@ def convert():
         flash("No files were successfully converted.", "danger")
         return redirect(url_for("convert"))
 
-    zip_path = OUTPUT_FOLDER / f"ofm_migrated_{run_id}.zip"
+    zip_path = OUTPUT_FOLDER / f"assert_cms_migrated_{run_id}.zip"
     with zipfile.ZipFile(str(zip_path), "w", zipfile.ZIP_DEFLATED) as zf:
         for f in out_root.rglob("*"):
             if f.is_file():
@@ -457,6 +458,131 @@ def api_analyze():
             results.append({"error": str(e), "file": fpath.name})
 
     return jsonify(results if len(results) > 1 else results[0])
+
+
+
+
+# ── Oracle Forms Code Generator ───────────────────────────────────────────────
+
+# In-process store: run_id → metadata
+_CODE_GEN_RUNS: dict = {}
+_CODE_GEN_OUTPUT_DIR = OUTPUT_FOLDER / "code_gen"
+_CODE_GEN_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+
+@app.route("/code-generator", methods=["GET", "POST"])
+def code_generator():
+    """
+    GET  → upload form
+    POST → run GeneratorEngine, save ZIP, redirect with download card
+    """
+    runs = list(_CODE_GEN_RUNS.values())
+
+    if request.method == "GET":
+        return render_template("code_generator.html", app_name=APP_NAME, runs=runs)
+
+    # ── Validate required files ────────────────────────────────────────────
+    main_sql = request.files.get("main_sql")
+    report_html = request.files.get("report_html")
+
+    if not main_sql or main_sql.filename == "":
+        flash("Please upload the main PL/SQL package SQL file.", "warning")
+        return render_template("code_generator.html", app_name=APP_NAME, runs=runs)
+    if not report_html or report_html.filename == "":
+        flash("Please upload the Forms HTML report.", "warning")
+        return render_template("code_generator.html", app_name=APP_NAME, runs=runs)
+
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+
+    # ── Save uploads ───────────────────────────────────────────────────────
+    sql_name = secure_filename(main_sql.filename)
+    html_name = secure_filename(report_html.filename)
+    sql_path  = UPLOAD_FOLDER / f"cg_{run_id}_{sql_name}"
+    html_path = UPLOAD_FOLDER / f"cg_{run_id}_{html_name}"
+    main_sql.save(str(sql_path))
+    report_html.save(str(html_path))
+
+    extra_sql_paths = []
+    for f in request.files.getlist("extra_sql"):
+        if f and f.filename:
+            p = UPLOAD_FOLDER / f"cg_{run_id}_{secure_filename(f.filename)}"
+            f.save(str(p))
+            extra_sql_paths.append(str(p))
+
+    types_csv_path = None
+    types_csv_file = request.files.get("types_csv")
+    if types_csv_file and types_csv_file.filename:
+        csv_name = secure_filename(types_csv_file.filename)
+        types_csv_path_obj = UPLOAD_FOLDER / f"cg_{run_id}_{csv_name}"
+        types_csv_file.save(str(types_csv_path_obj))
+        types_csv_path = str(types_csv_path_obj)
+
+    out_zip = _CODE_GEN_OUTPUT_DIR / f"generated_{run_id}.zip"
+
+    # ── Run engine ─────────────────────────────────────────────────────────
+    log_lines: list = []
+    try:
+        loader = InputLoader()
+        bundle = loader.load(
+            main_sql_path=str(sql_path),
+            additional_sql_paths=extra_sql_paths,
+            report_path=str(html_path),
+            output_zip_path=str(out_zip),
+            types_csv_path=types_csv_path,
+        )
+        log_lines.append(f"Package: {bundle.package_name}")
+        if bundle.schema_name:
+            log_lines.append(f"Schema: {bundle.schema_name}")
+        if bundle.types_csv_path:
+            log_lines.append(f"Types CSV: {bundle.types_csv_path.name}")
+
+        model, files = GeneratorEngine().run(bundle)
+        log_lines.append(f"Main block: {model.main_block}")
+        log_lines.append(f"Fields: {len(model.fields)}")
+        log_lines.append(f"Buttons: {len(model.buttons)}")
+        log_lines.append(f"Validation fields: {len(model.validation_fields)}")
+        log_lines.append(f"Generated files: {len(files)}")
+
+        import zipfile as _zf
+        with _zf.ZipFile(str(out_zip), "w", compression=_zf.ZIP_DEFLATED) as z:
+            for name, content in files.items():
+                z.writestr(name, content)
+
+        log_lines.append(f"ZIP written: {out_zip.name}")
+
+    except Exception as exc:
+        app.logger.debug(traceback.format_exc())
+        flash(f"Code generation failed: {exc}", "danger")
+        return render_template("code_generator.html", app_name=APP_NAME, runs=runs)
+
+    pkg = getattr(bundle, "package_name", sql_name.removesuffix(".sql"))
+    _CODE_GEN_RUNS[run_id] = {
+        "run_id":       run_id,
+        "package_name": pkg,
+        "file_count":   len(files),
+        "generated_at": datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "out_path":     str(out_zip),
+        "log":          log_lines,
+    }
+
+    flash(f"Generated <strong>{len(files)} files</strong> for <strong>{pkg}</strong>.", "success")
+    return redirect(url_for("code_generator"))
+
+
+@app.route("/code-generator/download/<run_id>")
+def code_generator_download(run_id: str):
+    meta = _CODE_GEN_RUNS.get(run_id)
+    if not meta:
+        flash("Run not found or session expired.", "warning")
+        return redirect(url_for("code_generator"))
+    out_path = Path(meta["out_path"])
+    if not out_path.exists():
+        flash("ZIP file no longer available. Please regenerate.", "warning")
+        return redirect(url_for("code_generator"))
+    download_name = f"{meta['package_name']}_generated.zip"
+    return send_file(str(out_path), as_attachment=True,
+                     download_name=download_name,
+                     mimetype="application/zip")
 
 
 if __name__ == "__main__":
